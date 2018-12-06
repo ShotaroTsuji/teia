@@ -1,0 +1,6 @@
+[package]
+name = "teia"
+version = "0.1.0"
+authors = ["Shotaro Tsuji <Shotaro.Tsuji@gmail.com>"]
+
+[dependencies]
