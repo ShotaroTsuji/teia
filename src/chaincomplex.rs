@@ -1,8 +1,8 @@
-use Index;
 use std::ops::Range;
+use Index;
 
 pub trait ChainComplex {
-    type Index : Index;
+    type Index: Index;
     type Vector;
 
     fn boundary(&self, index: Self::Index) -> Self::Vector;

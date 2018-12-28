@@ -8,7 +8,7 @@ pub trait Z2Vector {
     fn lowest(&self) -> Option<&Self::Index>;
 }
 
-#[derive(Debug,Clone)]
+#[derive(Debug, Clone)]
 pub struct Z2VecVector<T> {
     // the elements must be sorted in the descending order.
     vec: Vec<T>,
@@ -19,17 +19,17 @@ unsafe impl<T: Index> Sync for Z2VecVector<T> {}
 
 impl<T: Index> Z2VecVector<T> {
     pub fn new() -> Self {
-        Z2VecVector {
-            vec: Vec::new(),
-        }
+        Z2VecVector { vec: Vec::new() }
     }
 
     pub fn is_valid(&self) -> bool {
         let mut prev = None;
         for x in self.vec.iter() {
             match (prev, x) {
-                (Some(p), x) if p <= x => { return false; },
-                _ => {},
+                (Some(p), x) if p <= x => {
+                    return false;
+                }
+                _ => {}
             }
             prev = Some(x);
         }
@@ -48,9 +48,7 @@ impl<T: Index> Z2Vector for Z2VecVector<T> {
 impl<T: Index> From<Vec<T>> for Z2VecVector<T> {
     fn from(mut vec: Vec<T>) -> Z2VecVector<T> {
         vec.sort_by(|a, b| b.cmp(a));
-        Z2VecVector {
-            vec: vec,
-        }
+        Z2VecVector { vec: vec }
     }
 }
 
@@ -61,12 +59,29 @@ impl<'a, T: Index> AddAssign<&'a Z2VecVector<T>> for Z2VecVector<T> {
         let mut j = 0;
         loop {
             match (self.vec.get(i), other.vec.get(j)) {
-                (None, None) => { break; },
-                (Some(x), None) => { result.push(*x); i += 1; },
-                (None, Some(y)) => { result.push(*y); j += 1; },
-                (Some(x), Some(y)) if x == y => { i += 1; j += 1; },
-                (Some(x), Some(y)) if x > y => { result.push(*x); i += 1; },
-                (Some(x), Some(y)) if x < y => { result.push(*y); j += 1; },
+                (None, None) => {
+                    break;
+                }
+                (Some(x), None) => {
+                    result.push(*x);
+                    i += 1;
+                }
+                (None, Some(y)) => {
+                    result.push(*y);
+                    j += 1;
+                }
+                (Some(x), Some(y)) if x == y => {
+                    i += 1;
+                    j += 1;
+                }
+                (Some(x), Some(y)) if x > y => {
+                    result.push(*x);
+                    i += 1;
+                }
+                (Some(x), Some(y)) if x < y => {
+                    result.push(*y);
+                    j += 1;
+                }
                 _ => unreachable!(),
             }
         }
@@ -100,7 +115,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use z2vector::{Z2VecVector};
+    use z2vector::Z2VecVector;
 
     #[test]
     pub fn z2vecvec_eq() {
