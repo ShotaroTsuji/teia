@@ -8,6 +8,19 @@ pub struct SimplicialComplex<V> {
     simplices: Vec<Simplex<V>>,
 }
 
+impl<V> std::fmt::Display for SimplicialComplex<V>
+where
+    V: Vertex,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        for i in 0..self.simplices.len() {
+            write!(f, "{}: {}", i, self.simplices[i])?;
+            write!(f, "{}", if i < self.simplices.len()-1 { "\n" } else { "" })?;
+        }
+        write!(f, "")
+    }
+}
+
 impl<V> SimplicialComplex<V>
 where
     V: Vertex,
@@ -23,6 +36,7 @@ where
     }
 
     pub fn build(self) -> SimplicialComplex<V> {
+        println!("{}", self);
         for i in 1..self.simplices.len() {
             let x: Option<Z2VecVector<usize>> = find_boundary(&self.simplices[0..i], &self.simplices[i]);
             println!("{:?}", x);
