@@ -1,9 +1,11 @@
 extern crate teia;
 
 use teia::simplex::Simplex;
+use teia::Orientation;
+use teia::simpcomp::SimplicialComplex;
+use teia::Vector;
 use teia::z2vector::Z2VecVector;
 use teia::z2vector::Z2Vector;
-use teia::Orientation;
 
 fn main() {
     let mut x = Z2VecVector::<u64>::new();
@@ -29,6 +31,7 @@ fn main() {
     print_boundary(Simplex::new(vec![0,1,2], Orientation::Positive));
     print_boundary(Simplex::new(vec![0,1,2,3,4,5], Orientation::Positive));
     print_boundary(Simplex::new(vec![0,1,3,5], Orientation::Negative));
+    print_boundary(Simplex::new(vec![5], Orientation::Negative));
     println!("");
 
     let s = Simplex::new(vec![0u64,1,2], Orientation::Positive);
@@ -38,6 +41,17 @@ fn main() {
     println!("s is face of t? => {}", s.is_face_of(&t));
     println!("t is face of s? => {}", t.is_face_of(&s));
     println!("s is face of s? => {}", s.is_face_of(&s));
+    println!("");
+
+    let mut builder = SimplicialComplex::<usize>::new();
+    builder.push(Simplex::new(vec![0], Orientation::Positive));
+    builder.push(Simplex::new(vec![1], Orientation::Positive));
+    builder.push(Simplex::new(vec![2], Orientation::Positive));
+    builder.push(Simplex::new(vec![0,1], Orientation::Positive));
+    builder.push(Simplex::new(vec![0,2], Orientation::Positive));
+    builder.push(Simplex::new(vec![1,2], Orientation::Positive));
+    builder.push(Simplex::new(vec![0,1,2], Orientation::Positive));
+    let _ = builder.build();
 }
 
 fn print_boundary(simp: Simplex<usize>) {

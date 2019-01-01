@@ -41,6 +41,10 @@ impl<V: Vertex> Simplex<V> {
         self.orientation
     }
 
+    pub fn vertices(&self) -> &[V] {
+        &self.vertices[..]
+    }
+
     pub fn is_face_of(&self, other: &Simplex<V>) -> bool {
         self.vertices
             .iter()
@@ -93,5 +97,40 @@ where
         } else {
             None
         }
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use simplex::Simplex;
+    use Orientation;
+
+    #[test]
+    fn test_simplex_boundary() {
+        let simplex = Simplex::new(vec![0u64,1,2,3], Orientation::Positive);
+        let boundary = simplex.boundary().collect::<Vec<Simplex<_>>>();
+        assert_eq!(boundary,
+                   vec![Simplex::new(vec![1u64,2,3], Orientation::Positive),
+                        Simplex::new(vec![0,2,3], Orientation::Negative),
+                        Simplex::new(vec![0,1,3], Orientation::Positive),
+                        Simplex::new(vec![0,1,2], Orientation::Negative)]);
+    }
+
+    #[test]
+    fn test_simplex_face() {
+        let s: Simplex<usize> = Simplex::new(vec![0, 1, 2, 3], Orientation::Positive);
+        let t: Simplex<usize> = Simplex::new(vec![0, 1, 3], Orientation::Positive);
+        test_simplex_face_inner(&s, &t);
+
+        let t: Simplex<usize> = Simplex::new(vec![0, 2, 3], Orientation::Positive);
+        test_simplex_face_inner(&s, &t);
+    }
+
+    fn test_simplex_face_inner(s: &Simplex<usize>, t: &Simplex<usize>) {
+        assert!(!s.is_face_of(t));
+        assert!(t.is_face_of(s));
+        assert!(s.is_face_of(s));
+        assert!(t.is_face_of(t));
     }
 }

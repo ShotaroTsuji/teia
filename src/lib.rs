@@ -1,8 +1,9 @@
 pub mod chaincomplex;
 pub mod simplex;
+pub mod simpcomp;
 pub mod z2vector;
 
-pub trait Index: Ord + Copy + std::fmt::Debug + std::fmt::Display {}
+pub trait Index: Ord + Copy + std::fmt::Debug + std::fmt::Display + num_traits::cast::FromPrimitive {}
 
 impl Index for u64 {}
 impl Index for u32 {}
@@ -13,6 +14,12 @@ pub trait Vertex: Ord + Copy + std::fmt::Debug + std::fmt::Display {}
 impl Vertex for u64 {}
 impl Vertex for u32 {}
 impl Vertex for usize {}
+
+pub trait Vector {
+    type Index : Index;
+    fn new() -> Self;
+    fn push_element(&mut self, index: Self::Index, orientation: Orientation);
+}
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Orientation {
@@ -25,6 +32,19 @@ impl Orientation {
         match self {
             Orientation::Positive => Orientation::Negative,
             Orientation::Negative => Orientation::Positive,
+        }
+    }
+}
+
+impl std::ops::Mul for Orientation {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self {
+        match (self, rhs) {
+            (Orientation::Positive, Orientation::Positive) => Orientation::Positive,
+            (Orientation::Positive, Orientation::Negative) => Orientation::Negative,
+            (Orientation::Negative, Orientation::Positive) => Orientation::Negative,
+            (Orientation::Negative, Orientation::Negative) => Orientation::Positive,
         }
     }
 }
