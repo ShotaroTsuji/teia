@@ -15,12 +15,6 @@ impl Vertex for u64 {}
 impl Vertex for u32 {}
 impl Vertex for usize {}
 
-pub trait Vector {
-    type Index : Index;
-    fn new() -> Self;
-    fn push_element(&mut self, index: Self::Index, orientation: Orientation);
-}
-
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Orientation {
     Positive,

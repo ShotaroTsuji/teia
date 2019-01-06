@@ -1,6 +1,7 @@
 use std::fmt;
 use std::ops::AddAssign;
-use {Vector, Index, Orientation};
+use std::iter::FromIterator;
+use {Index, Orientation};
 
 pub trait Z2Vector {
     type Index;
@@ -15,6 +16,12 @@ pub struct Z2VecVector<T> {
 }
 
 impl<T: Index> Z2VecVector<T> {
+    pub fn new() -> Self {
+        Z2VecVector {
+            vec: Vec::new(),
+        }
+    }
+
     pub fn is_valid(&self) -> bool {
         let mut prev = None;
         for x in self.vec.iter() {
@@ -38,16 +45,17 @@ impl<T: Index> Z2Vector for Z2VecVector<T> {
     }
 }
 
-impl<T: Index> Vector for Z2VecVector<T> {
-    type Index = T;
+impl<T: Index> FromIterator<(T, Orientation)> for Z2VecVector<T> {
+    fn from_iter<I: IntoIterator<Item=(T, Orientation)>>(iter: I) -> Self {
+        let mut vec = Vec::new();
+        for (pos, ori) in iter {
+            vec.push(pos);
+        }
+        vec.sort_by(|a, b| b.cmp(a));
 
-    fn new() -> Self {
-        Z2VecVector { vec: Vec::new() }
-    }
-
-    fn push_element(&mut self, index: T, _orientation: Orientation) {
-        self.vec.push(index);
-        self.vec.sort();
+        Z2VecVector {
+            vec: vec,
+        }
     }
 }
 

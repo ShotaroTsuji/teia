@@ -2,8 +2,7 @@ extern crate teia;
 
 use teia::simplex::Simplex;
 use teia::Orientation;
-use teia::simpcomp::SimplicialComplex;
-use teia::Vector;
+use teia::simpcomp::SimplicialComplexBuilder;
 use teia::z2vector::Z2VecVector;
 use teia::z2vector::Z2Vector;
 
@@ -43,7 +42,7 @@ fn main() {
     println!("s is face of s? => {}", s.is_face_of(&s));
     println!("");
 
-    let mut builder = SimplicialComplex::<usize>::new();
+    let mut builder = SimplicialComplexBuilder::<usize>::new();
     builder.push(Simplex::new(vec![0], Orientation::Positive));
     builder.push(Simplex::new(vec![1], Orientation::Positive));
     builder.push(Simplex::new(vec![2], Orientation::Positive));
@@ -51,7 +50,14 @@ fn main() {
     builder.push(Simplex::new(vec![0,2], Orientation::Positive));
     builder.push(Simplex::new(vec![1,2], Orientation::Positive));
     builder.push(Simplex::new(vec![0,1,2], Orientation::Positive));
-    let _ = builder.build();
+    let simpcomp = builder.build().unwrap();
+    println!("{}", simpcomp);
+    println!("");
+
+    for i in 0..simpcomp.len() {
+        let chain = simpcomp.enumerate_boundary(i).collect::<Z2VecVector<usize>>();
+        println!("{}", chain);
+    }
 }
 
 fn print_boundary(simp: Simplex<usize>) {
