@@ -1,26 +1,27 @@
 use std::collections::BTreeMap;
 use crate::Index;
 use crate::z2vector::Z2Vector;
-use num_traits::FromPrimitive;
+use num_traits::{FromPrimitive, ToPrimitive};
 
 #[derive(Debug)]
 pub struct Z2Reducer<I, V> {
     reduced: Vec<V>,
-    _phantom: std::marker::PhantomData<fn () -> I>,
+    lowest_memo: BTreeMap<I, I>,
 }
 
 impl<I, V> Z2Reducer<I, V>
 where
     I: Index,
-    V: Z2Vector + std::fmt::Debug,
+    V: Z2Vector<Index = I> + std::fmt::Debug,
 {
     pub fn new() -> Z2Reducer<I, V> {
         Z2Reducer {
             reduced: Vec::new(),
-            _phantom: std::marker::PhantomData,
+            lowest_memo: BTreeMap::new(),
         }
     }
 
+    /*
     pub fn find_same_lowest(&self, boundary: &V) -> Option<(I, &V)> {
         match boundary.lowest() {
             Some(lowest) => {
@@ -36,6 +37,12 @@ where
             None => None,
         }
     }
+    */
+    pub fn find_same_lowest(&self, boundary: &V) -> Option<(I, &V)> {
+        boundary.lowest().and_then(|lowest|
+            self.lowest_memo.get(lowest).map(|pos|
+                (*pos, &self.reduced[ToPrimitive::to_usize(pos).unwrap()])))
+    }
 
     pub fn reduce(&self, boundary: &mut V) {
         println!("reduce the boundary {:?}", boundary);
@@ -48,6 +55,11 @@ where
     pub fn push(&mut self, mut boundary: V) {
         if boundary.lowest().is_some() {
             self.reduce(&mut boundary);
+        }
+
+        if let Some(&lowest) = boundary.lowest() {
+            let index = FromPrimitive::from_usize(self.reduced.len()).unwrap();
+            self.lowest_memo.insert(lowest, index);
         }
 
         self.reduced.push(boundary);

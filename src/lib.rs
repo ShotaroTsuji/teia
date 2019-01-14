@@ -4,7 +4,7 @@ pub mod simpcomp;
 pub mod z2vector;
 pub mod z2reduce;
 
-pub trait Index: Ord + PartialEq + Copy + std::fmt::Debug + std::fmt::Display + num_traits::cast::FromPrimitive {}
+pub trait Index: Ord + PartialEq + Copy + std::fmt::Debug + std::fmt::Display + num_traits::cast::FromPrimitive + num_traits::cast::ToPrimitive {}
 
 impl Index for u64 {}
 impl Index for u32 {}
