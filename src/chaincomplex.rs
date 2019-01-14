@@ -1,5 +1,5 @@
 use std::ops::Range;
-use Index;
+use crate::Index;
 
 pub trait ChainComplex {
     type Index: Index;

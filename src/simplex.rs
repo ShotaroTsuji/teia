@@ -1,7 +1,5 @@
 use std::marker::PhantomData;
-use IteratorExclude;
-use Orientation;
-use Vertex;
+use crate::{IteratorExclude, Orientation, Vertex};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Simplex<V> {

@@ -1,7 +1,5 @@
-use Vertex;
-use Index;
-use Orientation;
-use simplex::Simplex;
+use crate::{Vertex, Index, Orientation};
+use crate::simplex::Simplex;
 use std::marker::PhantomData;
 
 pub struct SimplicialComplexBuilder<V> {
