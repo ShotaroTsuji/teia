@@ -6,7 +6,7 @@ use num_traits::{FromPrimitive, ToPrimitive};
 #[derive(Debug)]
 pub struct Z2Reducer<I, V> {
     reduced: Vec<V>,
-    lowest_memo: BTreeMap<I, I>,
+    lowest_memo: BTreeMap<I, usize>,
 }
 
 impl<I, V> Z2Reducer<I, V>
@@ -40,8 +40,8 @@ where
     */
     pub fn find_same_lowest(&self, boundary: &V) -> Option<(I, &V)> {
         boundary.lowest().and_then(|lowest|
-            self.lowest_memo.get(lowest).map(|pos|
-                (*pos, &self.reduced[ToPrimitive::to_usize(pos).unwrap()])))
+            self.lowest_memo.get(lowest)
+                .map(|pos| (FromPrimitive::from_usize(*pos).unwrap(), &self.reduced[*pos])))
     }
 
     pub fn reduce(&self, boundary: &mut V) {
@@ -58,7 +58,7 @@ where
         }
 
         if let Some(&lowest) = boundary.lowest() {
-            let index = FromPrimitive::from_usize(self.reduced.len()).unwrap();
+            let index = self.reduced.len();
             self.lowest_memo.insert(lowest, index);
         }
 
