@@ -4,7 +4,15 @@ pub mod simpcomp;
 pub mod z2vector;
 pub mod z2reduce;
 
-pub trait Index: Ord + PartialEq + Copy + std::fmt::Debug + std::fmt::Display + num_traits::cast::FromPrimitive + num_traits::cast::ToPrimitive {}
+pub trait Index: Ord + PartialEq + Copy + std::fmt::Debug + std::fmt::Display + num_traits::cast::FromPrimitive + num_traits::cast::ToPrimitive {
+    fn from_usize(n: usize) -> Self {
+        num_traits::cast::FromPrimitive::from_usize(n).unwrap()
+    }
+
+    fn to_usize(&self) -> usize {
+        num_traits::cast::ToPrimitive::to_usize(self).unwrap()
+    }
+}
 
 impl Index for u64 {}
 impl Index for u32 {}

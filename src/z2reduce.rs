@@ -1,7 +1,6 @@
 use std::collections::BTreeMap;
 use crate::Index;
 use crate::z2vector::Z2Vector;
-use num_traits::{FromPrimitive, ToPrimitive};
 
 #[derive(Debug)]
 pub struct Z2Reducer<I, V> {
@@ -41,7 +40,7 @@ where
     pub fn find_same_lowest(&self, boundary: &V) -> Option<(I, &V)> {
         boundary.lowest().and_then(|lowest|
             self.lowest_memo.get(lowest)
-                .map(|pos| (FromPrimitive::from_usize(*pos).unwrap(), &self.reduced[*pos])))
+                .map(|pos| (Index::from_usize(*pos), &self.reduced[*pos])))
     }
 
     pub fn reduce(&self, boundary: &mut V) {

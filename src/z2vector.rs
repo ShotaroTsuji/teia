@@ -84,7 +84,7 @@ impl<T: Index> Z2Vector for Z2VecVector<T> {
 impl<T: Index> FromIterator<(T, Orientation)> for Z2VecVector<T> {
     fn from_iter<I: IntoIterator<Item=(T, Orientation)>>(iter: I) -> Self {
         let mut vec = Vec::new();
-        for (pos, ori) in iter {
+        for (pos, _ori) in iter {
             vec.push(pos);
         }
         vec.sort_by(|a, b| b.cmp(a));
