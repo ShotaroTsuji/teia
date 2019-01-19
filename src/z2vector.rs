@@ -1,5 +1,4 @@
 use std::fmt;
-use std::ops::AddAssign;
 use std::iter::FromIterator;
 use crate::{Index, Orientation};
 
