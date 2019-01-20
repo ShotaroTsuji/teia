@@ -5,7 +5,7 @@ use teia::Orientation;
 use teia::simpcomp::SimplicialComplexBuilder;
 use teia::z2vector::Z2VecVector;
 use teia::z2vector::Z2Vector;
-use teia::z2reduce::Z2Reducer;
+use teia::z2reduce::Z2ColumnReducer;
 
 fn main() {
     let mut x = Z2VecVector::<u64>::new();
@@ -61,7 +61,7 @@ fn main() {
     }
 
     println!("Run the reducer");
-    let mut reducer = Z2Reducer::<usize, Z2VecVector<usize>>::new();
+    let mut reducer = Z2ColumnReducer::<usize, Z2VecVector<usize>>::new();
 
     for i in 0..simpcomp.len() {
         let chain = simpcomp.enumerate_boundary(i).collect::<Z2VecVector<usize>>();

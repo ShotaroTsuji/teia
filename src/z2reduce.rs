@@ -3,18 +3,18 @@ use crate::Index;
 use crate::z2vector::Z2Vector;
 
 #[derive(Debug)]
-pub struct Z2Reducer<I, V> {
+pub struct Z2ColumnReducer<I, V> {
     reduced: Vec<V>,
     lowest_memo: BTreeMap<I, usize>,
 }
 
-impl<I, V> Z2Reducer<I, V>
+impl<I, V> Z2ColumnReducer<I, V>
 where
     I: Index,
     V: Z2Vector<Index = I> + std::fmt::Debug,
 {
-    pub fn new() -> Z2Reducer<I, V> {
-        Z2Reducer {
+    pub fn new() -> Z2ColumnReducer<I, V> {
+        Z2ColumnReducer {
             reduced: Vec::new(),
             lowest_memo: BTreeMap::new(),
         }
