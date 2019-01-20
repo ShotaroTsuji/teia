@@ -1,7 +1,5 @@
-use Vertex;
-use Index;
-use Orientation;
-use simplex::Simplex;
+use crate::{Vertex, Index, Orientation};
+use crate::simplex::Simplex;
 use std::marker::PhantomData;
 
 pub struct SimplicialComplexBuilder<V> {
@@ -115,7 +113,7 @@ where
             Some(face) => {
                 let pos = self.simplices.iter().position(|t| t.vertices() == face.vertices()).unwrap();
                 let sign = self.simplices[pos].orientation() * face.orientation();
-                Some((num_traits::FromPrimitive::from_usize(pos).unwrap(), sign))
+                Some((Index::from_usize(pos), sign))
             },
             None => None,
         }

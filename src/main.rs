@@ -5,6 +5,7 @@ use teia::Orientation;
 use teia::simpcomp::SimplicialComplexBuilder;
 use teia::z2vector::Z2VecVector;
 use teia::z2vector::Z2Vector;
+use teia::z2reduce::Z2Reducer;
 
 fn main() {
     let mut x = Z2VecVector::<u64>::new();
@@ -17,10 +18,10 @@ fn main() {
     println!("lowest of y = {:?}", y.lowest());
     println!("lowest of z = {:?}", z.lowest());
     println!("Add y to x");
-    x += &y;
+    x.add_assign(&y);
     println!("x = {}", x);
     println!("Add z to x");
-    x += &z;
+    x.add_assign(&z);
     println!("x = {}", x);
     println!("x is valid? => {}", x.is_valid());
     println!("x is y? => {}", x == y);
@@ -58,6 +59,15 @@ fn main() {
         let chain = simpcomp.enumerate_boundary(i).collect::<Z2VecVector<usize>>();
         println!("{}", chain);
     }
+
+    println!("Run the reducer");
+    let mut reducer = Z2Reducer::<usize, Z2VecVector<usize>>::new();
+
+    for i in 0..simpcomp.len() {
+        let chain = simpcomp.enumerate_boundary(i).collect::<Z2VecVector<usize>>();
+        reducer.push(chain);
+    }
+    println!("{:?}", reducer);
 }
 
 fn print_boundary(simp: Simplex<usize>) {

@@ -1,12 +1,12 @@
 use std::fmt;
-use std::ops::AddAssign;
 use std::iter::FromIterator;
-use {Index, Orientation};
+use crate::{Index, Orientation};
 
 pub trait Z2Vector {
-    type Index;
+    type Index : Index;
 
     fn lowest(&self) -> Option<&Self::Index>;
+    fn add_assign(&mut self, other: &Self);
 }
 
 #[derive(Debug, Clone)]
@@ -43,30 +43,7 @@ impl<T: Index> Z2Vector for Z2VecVector<T> {
     fn lowest(&self) -> Option<&T> {
         self.vec.get(0)
     }
-}
 
-impl<T: Index> FromIterator<(T, Orientation)> for Z2VecVector<T> {
-    fn from_iter<I: IntoIterator<Item=(T, Orientation)>>(iter: I) -> Self {
-        let mut vec = Vec::new();
-        for (pos, ori) in iter {
-            vec.push(pos);
-        }
-        vec.sort_by(|a, b| b.cmp(a));
-
-        Z2VecVector {
-            vec: vec,
-        }
-    }
-}
-
-impl<T: Index> From<Vec<T>> for Z2VecVector<T> {
-    fn from(mut vec: Vec<T>) -> Z2VecVector<T> {
-        vec.sort_by(|a, b| b.cmp(a));
-        Z2VecVector { vec: vec }
-    }
-}
-
-impl<'a, T: Index> AddAssign<&'a Z2VecVector<T>> for Z2VecVector<T> {
     fn add_assign(&mut self, other: &Z2VecVector<T>) {
         let mut result = Vec::new();
         let mut i = 0;
@@ -100,6 +77,27 @@ impl<'a, T: Index> AddAssign<&'a Z2VecVector<T>> for Z2VecVector<T> {
             }
         }
         *self = Z2VecVector { vec: result };
+    }
+}
+
+impl<T: Index> FromIterator<(T, Orientation)> for Z2VecVector<T> {
+    fn from_iter<I: IntoIterator<Item=(T, Orientation)>>(iter: I) -> Self {
+        let mut vec = Vec::new();
+        for (pos, _ori) in iter {
+            vec.push(pos);
+        }
+        vec.sort_by(|a, b| b.cmp(a));
+
+        Z2VecVector {
+            vec: vec,
+        }
+    }
+}
+
+impl<T: Index> From<Vec<T>> for Z2VecVector<T> {
+    fn from(mut vec: Vec<T>) -> Z2VecVector<T> {
+        vec.sort_by(|a, b| b.cmp(a));
+        Z2VecVector { vec: vec }
     }
 }
 
