@@ -2,6 +2,7 @@ pub mod chaincomplex;
 pub mod simplex;
 pub mod simpcomp;
 pub mod z2vector;
+pub mod z2reduce;
 
 pub trait Index: Ord + Copy + std::fmt::Debug + std::fmt::Display + num_traits::cast::FromPrimitive {}
 
