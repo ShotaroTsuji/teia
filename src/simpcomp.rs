@@ -84,6 +84,10 @@ where
         self.simplices.len()
     }
 
+    pub fn range<I: Index>(&self) -> std::ops::Range<I> {
+        Index::zero()..Index::from_usize(self.len())
+    }
+
     pub fn enumerate_boundary<'a, I: Index>(&'a self, index: usize) -> EnumerateBoundary<'a, V, I> {
         EnumerateBoundary {
             simplices: &self.simplices[0..index],
@@ -92,6 +96,16 @@ where
             _phantom2: PhantomData,
         }
     }
+
+    /*
+    pub fn boundaries<'a, I: Index>(&'a mut self) -> Boundaries<'a, V, I> {
+        Boundaries {
+            simpcomp: self,
+            index: Index::zero(),
+            _phantom: PhantomData,
+        }
+    }
+    */
 }
 
 pub struct EnumerateBoundary<'a, V, I> {
@@ -119,3 +133,23 @@ where
         }
     }
 }
+
+/*
+pub struct Boundaries<'a, V, I> {
+    simpcomp: &'a mut SimplicialComplex<V>,
+    index: I,
+    _phantom: PhantomData<&'a mut SimplicialComplex<V>>,
+}
+
+impl<'a, V, I, C> Iterator for Boundaries<'a, V, I, C>
+where
+    V: Vertex,
+    I: Index,
+    C: FromIterator<(I, Orientation)>,
+{
+    type Item = C;
+
+    fn next(&mut self) -> Option<Self::Item> {
+    }
+}
+*/

@@ -55,18 +55,23 @@ fn main() {
     println!("{}", simpcomp);
     println!("");
 
-    for i in 0..simpcomp.len() {
+    println!("Range: {:?}", simpcomp.range::<usize>());
+
+    for i in simpcomp.range::<usize>() {
         let chain = simpcomp.enumerate_boundary(i).collect::<Z2VecVector<usize>>();
         println!("{}", chain);
     }
 
+    println!("");
+
     println!("Run the reducer");
     let mut reducer = Z2ColumnReducer::<usize, Z2VecVector<usize>>::new();
 
-    for i in 0..simpcomp.len() {
+    for i in simpcomp.range::<usize>() {
         let chain = simpcomp.enumerate_boundary(i).collect::<Z2VecVector<usize>>();
         reducer.push(chain);
     }
+    println!("");
     println!("{:?}", reducer);
 }
 
