@@ -73,6 +73,11 @@ fn main() {
     }
     println!("");
     println!("{:?}", reducer);
+
+    println!("");
+    for c in reducer.cycles() {
+        println!("{:?}", c);
+    }
 }
 
 fn print_boundary(simp: Simplex<usize>) {

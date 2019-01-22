@@ -6,6 +6,12 @@ pub trait Z2Vector {
     type Index : Index;
 
     fn lowest(&self) -> Option<&Self::Index>;
+
+    #[inline]
+    fn is_cycle(&self) -> bool {
+        self.lowest().is_none()
+    }
+
     fn add_assign(&mut self, other: &Self);
 }
 
@@ -40,6 +46,7 @@ impl<T: Index> Z2VecVector<T> {
 impl<T: Index> Z2Vector for Z2VecVector<T> {
     type Index = T;
 
+    #[inline]
     fn lowest(&self) -> Option<&T> {
         self.vec.get(0)
     }

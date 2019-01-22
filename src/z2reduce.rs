@@ -5,6 +5,7 @@ use crate::z2vector::Z2Vector;
 #[derive(Debug)]
 pub struct Z2ColumnReducer<I, V> {
     reduced: Vec<V>,
+    // mapping of lowest index to position in `reduced`
     lowest_memo: BTreeMap<I, usize>,
 }
 
@@ -62,5 +63,11 @@ where
         }
 
         self.reduced.push(boundary);
+    }
+
+    pub fn cycles<'a>(&'a self) -> impl Iterator<Item=(usize, &V)> {
+        self.reduced.iter()
+            .enumerate()
+            .filter(|(_, c): &(usize, &V)| c.is_cycle())
     }
 }
