@@ -1,6 +1,6 @@
 pub mod chaincomplex;
 pub mod simplex;
-pub mod simpcomp;
+pub mod complex;
 pub mod z2vector;
 pub mod z2reduce;
 

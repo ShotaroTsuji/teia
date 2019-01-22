@@ -2,16 +2,16 @@ use crate::{Vertex, Index, Orientation};
 use crate::simplex::Simplex;
 use std::marker::PhantomData;
 
-pub struct SimplicialComplexBuilder<V> {
+pub struct ComplexBuilder<V> {
     simplices: Vec<Simplex<V>>,
 }
 
-impl<V> SimplicialComplexBuilder<V>
+impl<V> ComplexBuilder<V>
 where
     V: Vertex,
 {
     pub fn new() -> Self {
-        SimplicialComplexBuilder {
+        ComplexBuilder {
             simplices: Vec::new(),
         }
     }
@@ -20,20 +20,20 @@ where
         self.simplices.push(simplex);
     }
 
-    pub fn build(self) -> Option<SimplicialComplex<V>> {
+    pub fn build(self) -> Option<Complex<V>> {
         for index in 1..self.simplices.len() {
             let result = check_boundary(&self.simplices[0..index], &self.simplices[index]);
             if result.is_none() {
                 return None;
             }
         }
-        Some(SimplicialComplex {
+        Some(Complex {
             simplices: self.simplices,
         })
     }
 
-    pub fn build_unchecked(self) -> SimplicialComplex<V> {
-        SimplicialComplex {
+    pub fn build_unchecked(self) -> Complex<V> {
+        Complex {
             simplices: self.simplices,
         }
     }
@@ -53,11 +53,11 @@ where
     Some(())
 }
 
-pub struct SimplicialComplex<V> {
+pub struct Complex<V> {
     simplices: Vec<Simplex<V>>,
 }
 
-impl<V> std::fmt::Display for SimplicialComplex<V>
+impl<V> std::fmt::Display for Complex<V>
 where
     V: Vertex,
 {
@@ -70,16 +70,10 @@ where
     }
 }
 
-impl<V> SimplicialComplex<V>
+impl<V> Complex<V>
 where
     V: Vertex,
 {
-    pub fn new() -> Self {
-        SimplicialComplex{
-            simplices: Vec::new(),
-        }
-    }
-
     pub fn len(&self) -> usize {
         self.simplices.len()
     }

@@ -2,7 +2,7 @@ extern crate teia;
 
 use teia::simplex::Simplex;
 use teia::Orientation;
-use teia::simpcomp::SimplicialComplexBuilder;
+use teia::complex::ComplexBuilder;
 use teia::z2vector::Z2VecVector;
 use teia::z2vector::Z2Vector;
 use teia::z2reduce::Z2ColumnReducer;
@@ -43,7 +43,7 @@ fn main() {
     println!("s is face of s? => {}", s.is_face_of(&s));
     println!("");
 
-    let mut builder = SimplicialComplexBuilder::<usize>::new();
+    let mut builder = ComplexBuilder::<usize>::new();
     builder.push(Simplex::new(vec![0], Orientation::Positive));
     builder.push(Simplex::new(vec![1], Orientation::Positive));
     builder.push(Simplex::new(vec![2], Orientation::Positive));
