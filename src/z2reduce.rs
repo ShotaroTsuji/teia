@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
-use crate::Index;
+use std::marker::PhantomData;
+use crate::{Index, Persistence};
 use crate::z2vector::Z2Vector;
 
 #[derive(Debug)]
@@ -69,5 +70,44 @@ where
         self.reduced.iter()
             .enumerate()
             .filter(|(_, c): &(usize, &V)| c.is_cycle())
+    }
+}
+
+pub struct Z2Pairer<'a, I, V, T> {
+    reducer: &'a Z2ColumnReducer<I, V>,
+    cycles: T,
+    _phantom: PhantomData<&'a Z2ColumnReducer<I, V>>,
+}
+
+impl<'a, I, V, T> Z2Pairer<'a, I, V, T>
+where
+    I: Index,
+    V: Z2Vector<Index=I>,
+    T: Iterator<Item=(usize, &'a V)>,
+{
+    pub fn new(reducer: &'a Z2ColumnReducer<I, V>, cycles: T) -> Self {
+        Z2Pairer {
+            reducer: reducer,
+            cycles: cycles,
+            _phantom: PhantomData,
+        }
+    }
+}
+
+impl<'a, I, V, T> Iterator for Z2Pairer<'a, I, V, T>
+where
+    I: Index,
+    V: Z2Vector<Index=I> + std::fmt::Debug,
+    T: Iterator<Item=(usize, &'a V)>,
+{
+    type Item = (Persistence<I>, &'a V);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.cycles.next()
+            .map(|(index, cycle)| {
+                let index= Index::from_usize(index);
+                let boundary_pos = self.reducer.lowest_memo.get(&index).map(|pos| Index::from_usize(*pos));
+                (Persistence(index, boundary_pos), cycle)
+            })
     }
 }

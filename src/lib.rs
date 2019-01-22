@@ -4,6 +4,9 @@ pub mod complex;
 pub mod z2vector;
 pub mod z2reduce;
 
+#[derive(Debug, Clone, Copy)]
+pub struct Persistence<T>(pub T, pub Option<T>);
+
 pub trait Index: Ord + PartialEq + Copy + std::fmt::Debug + std::fmt::Display + num_traits::cast::FromPrimitive + num_traits::cast::ToPrimitive + num_traits::identities::Zero {
     #[inline]
     fn from_usize(n: usize) -> Self {
