@@ -1,8 +1,12 @@
 use std::marker::PhantomData;
 use crate::{IteratorExclude, Orientation};
 
+/// The struct represents simplex
+///
+/// This struct represents a simplex, which is a set of vertices with orientation.
 #[derive(Debug, PartialEq, Clone)]
 pub struct Simplex {
+    /// The vertices ordered in descending order.
     vertices: Vec<usize>,
     orientation: Orientation,
 }
@@ -22,6 +26,11 @@ impl std::fmt::Display for Simplex {
 }
 
 impl Simplex {
+    /// Create new simplex from vertices and orientation
+    ///
+    /// This method creates a new simplex from vertices and orientation.
+    /// The vertices are sorted in descending order by this method.
+    /// The order of vertices in `vertices` is ignored.
     pub fn new(mut vertices: Vec<usize>, ori: Orientation) -> Simplex {
         assert!(vertices.len() > 0);
         vertices.sort();
@@ -31,24 +40,56 @@ impl Simplex {
         }
     }
 
+    /// Returns the dimension of simplex
+    ///
+    /// # Example
+    /// ```
+    /// use teia::Orientation;
+    /// use teia::simplex::Simplex;
+    ///
+    /// let s = Simplex::new(vec![0], Orientation::Positive);
+    /// assert_eq!(s.dimension(), 0);
+    ///
+    /// let s = Simplex::new(vec![3, 4, 8, 10], Orientation::Positive);
+    /// assert_eq!(s.dimension(), 3);
+    /// ```
     pub fn dimension(&self) -> usize {
         self.vertices.len() - 1
     }
 
+    /// Returns the orientation of simplex
     pub fn orientation(&self) -> Orientation {
         self.orientation
     }
 
+    /// Returns the reference to the slice of vertices
     pub fn vertices(&self) -> &[usize] {
         &self.vertices[..]
     }
 
+    /// Checks whether `self` is a face of `other`
+    ///
+    /// It returns true if `self` is a face of `other`
+    /// and returns false if not.
+    ///
+    /// # Example
+    /// ```
+    /// use teia::Orientation;
+    /// use teia::simplex::Simplex;
+    ///
+    /// let s = Simplex::new(vec![0,1,2,3], Orientation::Positive);
+    /// let t = Simplex::new(vec![1,3], Orientation::Positive);
+    /// assert_eq!(t.is_face_of(&s), true);
+    /// ```
     pub fn is_face_of(&self, other: &Simplex) -> bool {
         self.vertices
             .iter()
             .all(|v| other.vertices.binary_search(v).is_ok())
     }
 
+    /// Computes the boundary of simplex
+    ///
+    /// This method returns an iterator that computes the boundary of simplex.
     pub fn boundary(&self) -> Boundary {
         Boundary {
             simplex: &self,
@@ -99,8 +140,8 @@ impl<'a> Iterator for Boundary<'a>
 
 #[cfg(test)]
 mod tests {
-    use simplex::Simplex;
-    use Orientation;
+    use crate::simplex::Simplex;
+    use crate::Orientation;
 
     #[test]
     fn test_simplex_boundary() {
