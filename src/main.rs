@@ -5,7 +5,7 @@ use teia::Orientation;
 use teia::complex::ComplexBuilder;
 use teia::z2vector::Z2VecVector;
 use teia::z2vector::Z2Vector;
-use teia::z2reduce::{Z2ColumnReducer, Z2Pairer};
+use teia::z2reduce::{Z2ColumnReduce, Z2Pair};
 
 fn main() {
     let mut x = Z2VecVector::new();
@@ -62,23 +62,23 @@ fn main() {
 
     println!("");
 
-    println!("Run the reducer");
-    let mut reducer = Z2ColumnReducer::<Z2VecVector>::new();
+    println!("Run the reduction");
+    let mut reduce = Z2ColumnReduce::<Z2VecVector>::new();
 
     for i in simpcomp.range() {
-        reducer.push(simpcomp.boundary(i));
+        reduce.push(simpcomp.boundary(i));
     }
     println!("");
-    println!("{:?}", reducer);
+    println!("{:?}", reduce);
 
     println!("");
-    for c in reducer.cycles() {
+    for c in reduce.cycles() {
         println!("{:?}", c);
     }
     println!("");
 
-    let pairer = Z2Pairer::new(&reducer, reducer.cycles());
-    for (pers, _) in pairer {
+    let pair = Z2Pair::new(&reduce, reduce.cycles());
+    for (pers, _) in pair {
         println!("{:?}", pers);
     }
 }

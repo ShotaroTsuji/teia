@@ -4,40 +4,23 @@ use crate::Persistence;
 use crate::z2vector::Z2Vector;
 
 #[derive(Debug)]
-pub struct Z2ColumnReducer<V> {
+pub struct Z2ColumnReduce<V> {
     reduced: Vec<V>,
     // mapping of lowest index to position in `reduced`
     lowest_memo: BTreeMap<usize, usize>,
 }
 
-impl<V> Z2ColumnReducer<V>
+impl<V> Z2ColumnReduce<V>
 where
     V: Z2Vector + std::fmt::Debug,
 {
-    pub fn new() -> Z2ColumnReducer<V> {
-        Z2ColumnReducer {
+    pub fn new() -> Z2ColumnReduce<V> {
+        Z2ColumnReduce {
             reduced: Vec::new(),
             lowest_memo: BTreeMap::new(),
         }
     }
 
-    /*
-    pub fn find_same_lowest(&self, boundary: &V) -> Option<(I, &V)> {
-        match boundary.lowest() {
-            Some(lowest) => {
-                for i in 0..self.reduced.len() {
-                    if let Some(pos) = self.reduced[i].lowest() {
-                        if *pos == *lowest {
-                            return Some((FromPrimitive::from_usize(i).unwrap(), &self.reduced[i]));
-                        }
-                    }
-                }
-                None
-            },
-            None => None,
-        }
-    }
-    */
     pub fn find_same_lowest(&self, boundary: &V) -> Option<(usize, &V)> {
         boundary.lowest().and_then(|lowest|
             self.lowest_memo.get(&lowest)
@@ -72,27 +55,27 @@ where
     }
 }
 
-pub struct Z2Pairer<'a, V, T> {
-    reducer: &'a Z2ColumnReducer<V>,
+pub struct Z2Pair<'a, V, T> {
+    reduce: &'a Z2ColumnReduce<V>,
     cycles: T,
-    _phantom: PhantomData<&'a Z2ColumnReducer<V>>,
+    _phantom: PhantomData<&'a Z2ColumnReduce<V>>,
 }
 
-impl<'a, V, T> Z2Pairer<'a, V, T>
+impl<'a, V, T> Z2Pair<'a, V, T>
 where
     V: Z2Vector,
     T: Iterator<Item=(usize, &'a V)>,
 {
-    pub fn new(reducer: &'a Z2ColumnReducer<V>, cycles: T) -> Self {
-        Z2Pairer {
-            reducer: reducer,
+    pub fn new(reduce: &'a Z2ColumnReduce<V>, cycles: T) -> Self {
+        Z2Pair {
+            reduce: reduce,
             cycles: cycles,
             _phantom: PhantomData,
         }
     }
 }
 
-impl<'a, V, T> Iterator for Z2Pairer<'a, V, T>
+impl<'a, V, T> Iterator for Z2Pair<'a, V, T>
 where
     V: Z2Vector + std::fmt::Debug,
     T: Iterator<Item=(usize, &'a V)>,
@@ -102,7 +85,7 @@ where
     fn next(&mut self) -> Option<Self::Item> {
         self.cycles.next()
             .map(|(index, cycle)| {
-                let boundary_pos = self.reducer.lowest_memo.get(&index).map(|pos| *pos);
+                let boundary_pos = self.reduce.lowest_memo.get(&index).map(|pos| *pos);
                 (Persistence(index, boundary_pos), cycle)
             })
     }
