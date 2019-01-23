@@ -1,6 +1,16 @@
 use std::marker::PhantomData;
 use crate::{IteratorExclude, Orientation};
 
+#[macro_export]
+macro_rules! simplex {
+    (+; $($x:expr),*) => (
+        $crate::simplex::Simplex::new(vec![$($x),*], Orientation::Positive)
+    );
+    (-; $($x:expr),*) => (
+        $crate::simplex::Simplex::new(vec![$($x),*], Orientation::Negative)
+    )
+}
+
 /// The struct represents simplex
 ///
 /// This struct represents a simplex, which is a set of vertices with orientation.
