@@ -1,4 +1,3 @@
-pub mod chaincomplex;
 pub mod simplex;
 pub mod complex;
 pub mod z2vector;
@@ -6,35 +5,6 @@ pub mod z2reduce;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Persistence<T>(pub T, pub Option<T>);
-
-pub trait Index: Ord + PartialEq + Copy + std::fmt::Debug + std::fmt::Display + num_traits::cast::FromPrimitive + num_traits::cast::ToPrimitive + num_traits::identities::Zero {
-    #[inline]
-    fn from_usize(n: usize) -> Self {
-        num_traits::cast::FromPrimitive::from_usize(n)
-            .expect("Index::from_usize")
-    }
-
-    #[inline]
-    fn to_usize(&self) -> usize {
-        num_traits::cast::ToPrimitive::to_usize(self)
-            .expect("Index::to_usize")
-    }
-
-    #[inline]
-    fn zero() -> Self {
-        num_traits::zero()
-    }
-}
-
-impl Index for u64 {}
-impl Index for u32 {}
-impl Index for usize {}
-
-pub trait Vertex: Ord + PartialEq + Copy + std::fmt::Debug + std::fmt::Display {}
-
-impl Vertex for u64 {}
-impl Vertex for u32 {}
-impl Vertex for usize {}
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Orientation {

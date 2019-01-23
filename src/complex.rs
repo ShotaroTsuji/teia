@@ -1,14 +1,12 @@
-use crate::{Vertex, Index, Orientation};
+use crate::Orientation;
 use crate::simplex::Simplex;
 use std::marker::PhantomData;
 
-pub struct ComplexBuilder<V> {
-    simplices: Vec<Simplex<V>>,
+pub struct ComplexBuilder {
+    simplices: Vec<Simplex>,
 }
 
-impl<V> ComplexBuilder<V>
-where
-    V: Vertex,
+impl ComplexBuilder
 {
     pub fn new() -> Self {
         ComplexBuilder {
@@ -16,11 +14,11 @@ where
         }
     }
 
-    pub fn push(&mut self, simplex: Simplex<V>) {
+    pub fn push(&mut self, simplex: Simplex) {
         self.simplices.push(simplex);
     }
 
-    pub fn build(self) -> Option<Complex<V>> {
+    pub fn build(self) -> Option<Complex> {
         for index in 1..self.simplices.len() {
             let result = check_boundary(&self.simplices[0..index], &self.simplices[index]);
             if result.is_none() {
@@ -32,17 +30,16 @@ where
         })
     }
 
-    pub fn build_unchecked(self) -> Complex<V> {
+    pub fn build_unchecked(self) -> Complex {
         Complex {
             simplices: self.simplices,
         }
     }
 }
 
-fn check_boundary<V, T>(simplices: T, simplex: &Simplex<V>) -> Option<()>
+fn check_boundary<T>(simplices: T, simplex: &Simplex) -> Option<()>
 where
-    V: Vertex,
-    T: AsRef<[Simplex<V>]>,
+    T: AsRef<[Simplex]>,
 {
     for t in simplex.boundary() {
         let pos = simplices.as_ref().iter().position(|s| s.vertices() == t.vertices());
@@ -53,13 +50,11 @@ where
     Some(())
 }
 
-pub struct Complex<V> {
-    simplices: Vec<Simplex<V>>,
+pub struct Complex {
+    simplices: Vec<Simplex>,
 }
 
-impl<V> std::fmt::Display for Complex<V>
-where
-    V: Vertex,
+impl std::fmt::Display for Complex
 {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         for i in 0..self.simplices.len() {
@@ -70,80 +65,43 @@ where
     }
 }
 
-impl<V> Complex<V>
-where
-    V: Vertex,
+impl Complex
 {
     pub fn len(&self) -> usize {
         self.simplices.len()
     }
 
-    pub fn range<I: Index>(&self) -> std::ops::Range<I> {
-        Index::zero()..Index::from_usize(self.len())
+    pub fn range(&self) -> std::ops::Range<usize> {
+        0..self.len()
     }
 
-    pub fn enumerate_boundary<'a, I: Index>(&'a self, index: usize) -> EnumerateBoundary<'a, V, I> {
+    pub fn enumerate_boundary<'a>(&'a self, index: usize) -> EnumerateBoundary<'a> {
         EnumerateBoundary {
             simplices: &self.simplices[0..index],
             boundary: self.simplices[index].boundary(),
             _phantom1: PhantomData,
-            _phantom2: PhantomData,
         }
     }
-
-    /*
-    pub fn boundaries<'a, I: Index>(&'a mut self) -> Boundaries<'a, V, I> {
-        Boundaries {
-            simpcomp: self,
-            index: Index::zero(),
-            _phantom: PhantomData,
-        }
-    }
-    */
 }
 
-pub struct EnumerateBoundary<'a, V, I> {
-    simplices: &'a [Simplex<V>],
-    boundary: crate::simplex::Boundary<'a, V>,
-    _phantom1: PhantomData<&'a Simplex<V>>,
-    _phantom2: PhantomData<fn () -> I>,
+pub struct EnumerateBoundary<'a> {
+    simplices: &'a [Simplex],
+    boundary: crate::simplex::Boundary<'a>,
+    _phantom1: PhantomData<&'a Simplex>,
 }
 
-impl<'a, V, I> Iterator for EnumerateBoundary<'a, V, I>
-where
-    V: Vertex,
-    I: Index,
+impl<'a> Iterator for EnumerateBoundary<'a>
 {
-    type Item = (I, Orientation);
+    type Item = (usize, Orientation);
 
     fn next(&mut self) -> Option<Self::Item> {
         match self.boundary.next() {
             Some(face) => {
                 let pos = self.simplices.iter().position(|t| t.vertices() == face.vertices()).unwrap();
                 let sign = self.simplices[pos].orientation() * face.orientation();
-                Some((Index::from_usize(pos), sign))
+                Some((pos, sign))
             },
             None => None,
         }
     }
 }
-
-/*
-pub struct Boundaries<'a, V, I> {
-    simpcomp: &'a mut SimplicialComplex<V>,
-    index: I,
-    _phantom: PhantomData<&'a mut SimplicialComplex<V>>,
-}
-
-impl<'a, V, I, C> Iterator for Boundaries<'a, V, I, C>
-where
-    V: Vertex,
-    I: Index,
-    C: FromIterator<(I, Orientation)>,
-{
-    type Item = C;
-
-    fn next(&mut self) -> Option<Self::Item> {
-    }
-}
-*/

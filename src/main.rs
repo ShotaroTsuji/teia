@@ -8,9 +8,9 @@ use teia::z2vector::Z2Vector;
 use teia::z2reduce::{Z2ColumnReducer, Z2Pairer};
 
 fn main() {
-    let mut x = Z2VecVector::<u64>::new();
-    let y: Z2VecVector<u64> = (vec![0, 1, 5]).into();
-    let z: Z2VecVector<u64> = vec![2, 4, 5, 6].into();
+    let mut x = Z2VecVector::new();
+    let y: Z2VecVector = (vec![0, 1, 5]).into();
+    let z: Z2VecVector = vec![2, 4, 5, 6].into();
     println!("x = {}", x);
     println!("y = {}", y);
     println!("z = {}", z);
@@ -34,8 +34,8 @@ fn main() {
     print_boundary(Simplex::new(vec![5], Orientation::Negative));
     println!("");
 
-    let s = Simplex::new(vec![0u64,1,2], Orientation::Positive);
-    let t = Simplex::new(vec![0u64,2], Orientation::Positive);
+    let s = Simplex::new(vec![0,1,2], Orientation::Positive);
+    let t = Simplex::new(vec![0,2], Orientation::Positive);
     println!("s = {}", s);
     println!("t = {}", t);
     println!("s is face of t? => {}", s.is_face_of(&t));
@@ -43,7 +43,7 @@ fn main() {
     println!("s is face of s? => {}", s.is_face_of(&s));
     println!("");
 
-    let mut builder = ComplexBuilder::<usize>::new();
+    let mut builder = ComplexBuilder::new();
     builder.push(Simplex::new(vec![0], Orientation::Positive));
     builder.push(Simplex::new(vec![1], Orientation::Positive));
     builder.push(Simplex::new(vec![2], Orientation::Positive));
@@ -55,20 +55,20 @@ fn main() {
     println!("{}", simpcomp);
     println!("");
 
-    println!("Range: {:?}", simpcomp.range::<usize>());
+    println!("Range: {:?}", simpcomp.range());
 
-    for i in simpcomp.range::<usize>() {
-        let chain = simpcomp.enumerate_boundary(i).collect::<Z2VecVector<usize>>();
+    for i in simpcomp.range() {
+        let chain = simpcomp.enumerate_boundary(i).collect::<Z2VecVector>();
         println!("{}", chain);
     }
 
     println!("");
 
     println!("Run the reducer");
-    let mut reducer = Z2ColumnReducer::<usize, Z2VecVector<usize>>::new();
+    let mut reducer = Z2ColumnReducer::<Z2VecVector>::new();
 
-    for i in simpcomp.range::<usize>() {
-        let chain = simpcomp.enumerate_boundary(i).collect::<Z2VecVector<usize>>();
+    for i in simpcomp.range() {
+        let chain = simpcomp.enumerate_boundary(i).collect::<Z2VecVector>();
         reducer.push(chain);
     }
     println!("");
@@ -86,7 +86,7 @@ fn main() {
     }
 }
 
-fn print_boundary(simp: Simplex<usize>) {
+fn print_boundary(simp: Simplex) {
     println!("simplex: {}", simp);
     println!("dimension = {}", simp.dimension());
     println!("boudnary = ");

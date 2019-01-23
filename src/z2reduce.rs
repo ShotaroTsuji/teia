@@ -1,21 +1,20 @@
 use std::collections::BTreeMap;
 use std::marker::PhantomData;
-use crate::{Index, Persistence};
+use crate::Persistence;
 use crate::z2vector::Z2Vector;
 
 #[derive(Debug)]
-pub struct Z2ColumnReducer<I, V> {
+pub struct Z2ColumnReducer<V> {
     reduced: Vec<V>,
     // mapping of lowest index to position in `reduced`
-    lowest_memo: BTreeMap<I, usize>,
+    lowest_memo: BTreeMap<usize, usize>,
 }
 
-impl<I, V> Z2ColumnReducer<I, V>
+impl<V> Z2ColumnReducer<V>
 where
-    I: Index,
-    V: Z2Vector<Index = I> + std::fmt::Debug,
+    V: Z2Vector + std::fmt::Debug,
 {
-    pub fn new() -> Z2ColumnReducer<I, V> {
+    pub fn new() -> Z2ColumnReducer<V> {
         Z2ColumnReducer {
             reduced: Vec::new(),
             lowest_memo: BTreeMap::new(),
@@ -39,10 +38,10 @@ where
         }
     }
     */
-    pub fn find_same_lowest(&self, boundary: &V) -> Option<(I, &V)> {
+    pub fn find_same_lowest(&self, boundary: &V) -> Option<(usize, &V)> {
         boundary.lowest().and_then(|lowest|
-            self.lowest_memo.get(lowest)
-                .map(|pos| (Index::from_usize(*pos), &self.reduced[*pos])))
+            self.lowest_memo.get(&lowest)
+                .map(|pos| (*pos, &self.reduced[*pos])))
     }
 
     pub fn reduce(&self, boundary: &mut V) {
@@ -58,7 +57,7 @@ where
             self.reduce(&mut boundary);
         }
 
-        if let Some(&lowest) = boundary.lowest() {
+        if let Some(lowest) = boundary.lowest() {
             let index = self.reduced.len();
             self.lowest_memo.insert(lowest, index);
         }
@@ -73,19 +72,18 @@ where
     }
 }
 
-pub struct Z2Pairer<'a, I, V, T> {
-    reducer: &'a Z2ColumnReducer<I, V>,
+pub struct Z2Pairer<'a, V, T> {
+    reducer: &'a Z2ColumnReducer<V>,
     cycles: T,
-    _phantom: PhantomData<&'a Z2ColumnReducer<I, V>>,
+    _phantom: PhantomData<&'a Z2ColumnReducer<V>>,
 }
 
-impl<'a, I, V, T> Z2Pairer<'a, I, V, T>
+impl<'a, V, T> Z2Pairer<'a, V, T>
 where
-    I: Index,
-    V: Z2Vector<Index=I>,
+    V: Z2Vector,
     T: Iterator<Item=(usize, &'a V)>,
 {
-    pub fn new(reducer: &'a Z2ColumnReducer<I, V>, cycles: T) -> Self {
+    pub fn new(reducer: &'a Z2ColumnReducer<V>, cycles: T) -> Self {
         Z2Pairer {
             reducer: reducer,
             cycles: cycles,
@@ -94,19 +92,17 @@ where
     }
 }
 
-impl<'a, I, V, T> Iterator for Z2Pairer<'a, I, V, T>
+impl<'a, V, T> Iterator for Z2Pairer<'a, V, T>
 where
-    I: Index,
-    V: Z2Vector<Index=I> + std::fmt::Debug,
+    V: Z2Vector + std::fmt::Debug,
     T: Iterator<Item=(usize, &'a V)>,
 {
-    type Item = (Persistence<I>, &'a V);
+    type Item = (Persistence<usize>, &'a V);
 
     fn next(&mut self) -> Option<Self::Item> {
         self.cycles.next()
             .map(|(index, cycle)| {
-                let index= Index::from_usize(index);
-                let boundary_pos = self.reducer.lowest_memo.get(&index).map(|pos| Index::from_usize(*pos));
+                let boundary_pos = self.reducer.lowest_memo.get(&index).map(|pos| *pos);
                 (Persistence(index, boundary_pos), cycle)
             })
     }
