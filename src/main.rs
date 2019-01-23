@@ -1,6 +1,5 @@
-extern crate teia;
-
 use teia::simplex::Simplex;
+use teia::simplex;
 use teia::Orientation;
 use teia::complex::ComplexBuilder;
 use teia::z2vector::Z2VecVector;
@@ -26,6 +25,13 @@ fn main() {
     println!("x is valid? => {}", x.is_valid());
     println!("x is y? => {}", x == y);
     println!("x is x? => {}", x == x);
+    println!("");
+
+    println!("Simplex constructor macro");
+    println!("{:?}", simplex![+; 0]);
+    println!("{:?}", simplex![+; 0,1]);
+    println!("{:?}", simplex![-; 0,1,3,4]);
+
     println!("");
 
     print_boundary(Simplex::new(vec![0,1,2], Orientation::Positive));

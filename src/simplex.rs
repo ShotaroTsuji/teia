@@ -4,10 +4,10 @@ use crate::{IteratorExclude, Orientation};
 #[macro_export]
 macro_rules! simplex {
     (+; $($x:expr),*) => (
-        $crate::simplex::Simplex::new(vec![$($x),*], Orientation::Positive)
+        $crate::simplex::Simplex::new(vec![$($x),*], $crate::Orientation::Positive)
     );
     (-; $($x:expr),*) => (
-        $crate::simplex::Simplex::new(vec![$($x),*], Orientation::Negative)
+        $crate::simplex::Simplex::new(vec![$($x),*], $crate::Orientation::Negative)
     )
 }
 
@@ -100,6 +100,19 @@ impl Simplex {
     /// Computes the boundary of simplex
     ///
     /// This method returns an iterator that computes the boundary of simplex.
+    ///
+    /// # Example
+    /// ```
+    /// use teia::simplex;
+    ///
+    /// let s = simplex![+; 0, 1, 2, 3];
+    /// let mut b = s.boundary();
+    /// assert_eq!(b.next(), Some(simplex![+; 1, 2, 3]));
+    /// assert_eq!(b.next(), Some(simplex![-; 0, 2, 3]));
+    /// assert_eq!(b.next(), Some(simplex![+; 0, 1, 3]));
+    /// assert_eq!(b.next(), Some(simplex![-; 0, 1, 2]));
+    /// assert_eq!(b.next(), None);
+    /// ```
     pub fn boundary(&self) -> Boundary {
         Boundary {
             simplex: &self,
