@@ -84,6 +84,15 @@ impl Complex
                 (pos, sign)
             }).collect()
     }
+
+    pub fn boundaries<'a, V: FromIterator<(usize, Orientation)>>(&'a self) -> Boundaries<'a, V> {
+        Boundaries {
+            complex: self,
+            range: 0..self.simplices.len(),
+            _phantom0: PhantomData,
+            _phantom1: PhantomData,
+        }
+    }
 }
 
 /// Return the position of `simplex` in the iterator `iter`.
@@ -94,4 +103,23 @@ where
     I: Iterator<Item = &'a Simplex>,
 {
     iter.position(|t| t.vertices() == simplex.vertices())
+}
+
+pub struct Boundaries<'a, V> {
+    complex: &'a Complex,
+    range: std::ops::Range<usize>,
+    _phantom0: PhantomData<&'a Complex>,
+    _phantom1: PhantomData<fn () -> V>,
+}
+
+impl<'a, V> Iterator for Boundaries<'a, V>
+where
+    V: FromIterator<(usize, Orientation)>,
+{
+    type Item = V;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.range.next()
+            .map(|index| self.complex.boundary(index))
+    }
 }

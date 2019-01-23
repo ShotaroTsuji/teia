@@ -56,9 +56,8 @@ fn main() {
     println!("");
 
     println!("Range: {:?}", simpcomp.range());
-    for i in simpcomp.range() {
-        let chain: Z2VecVector = simpcomp.boundary(i);
-        println!("{}", chain);
+    for v in simpcomp.boundaries::<Z2VecVector>() {
+        println!("{}", v);
     }
 
     println!("");
