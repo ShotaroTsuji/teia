@@ -128,7 +128,7 @@ impl std::fmt::Display for Z2VecVector
 
 #[cfg(test)]
 mod tests {
-    use z2vector::Z2VecVector;
+    use crate::z2vector::{Z2Vector, Z2VecVector};
 
     #[test]
     pub fn z2vecvec_eq() {
@@ -153,13 +153,13 @@ mod tests {
         let y: Z2VecVector = vec![1, 2, 5, 9, 11].into();
         let z: Z2VecVector = vec![0, 1, 6, 9, 11].into();
         let zero = Z2VecVector::new();
-        x += &y;
+        x.add_assign(&y);
         assert!(x.is_valid());
         assert_eq!(x, z);
-        x += &z;
+        x.add_assign(&z);
         assert!(x.is_valid());
         assert_eq!(x, zero);
-        x += &y;
+        x.add_assign(&y);
         assert!(x.is_valid());
         assert_eq!(x, y);
     }
