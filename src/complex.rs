@@ -42,7 +42,7 @@ where
     T: AsRef<[Simplex]>,
 {
     for t in simplex.boundary() {
-        let pos = simplices.as_ref().iter().position(|s| s.vertices() == t.vertices());
+        let pos = simplex_position(simplices.as_ref().iter(), &t);
         if pos.is_none() {
             return None;
         }
@@ -97,11 +97,21 @@ impl<'a> Iterator for EnumerateBoundary<'a>
     fn next(&mut self) -> Option<Self::Item> {
         match self.boundary.next() {
             Some(face) => {
-                let pos = self.simplices.iter().position(|t| t.vertices() == face.vertices()).unwrap();
+                let pos = simplex_position(self.simplices.iter(), &face).unwrap();
                 let sign = self.simplices[pos].orientation() * face.orientation();
                 Some((pos, sign))
             },
             None => None,
         }
     }
+}
+
+/// Return the position of `simplex` in the iterator `iter`.
+///
+/// The comparision ignores the orientation of simplices.
+fn simplex_position<'a, I>(mut iter: I, simplex: &Simplex) -> Option<usize>
+where
+    I: Iterator<Item = &'a Simplex>,
+{
+    iter.position(|t| t.vertices() == simplex.vertices())
 }
