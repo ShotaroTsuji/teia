@@ -1,5 +1,6 @@
 use crate::Orientation;
 use crate::simplex::Simplex;
+use std::iter::FromIterator;
 use std::marker::PhantomData;
 
 pub struct ComplexBuilder {
@@ -75,34 +76,13 @@ impl Complex
         0..self.len()
     }
 
-    pub fn enumerate_boundary<'a>(&'a self, index: usize) -> EnumerateBoundary<'a> {
-        EnumerateBoundary {
-            simplices: &self.simplices[0..index],
-            boundary: self.simplices[index].boundary(),
-            _phantom1: PhantomData,
-        }
-    }
-}
-
-pub struct EnumerateBoundary<'a> {
-    simplices: &'a [Simplex],
-    boundary: crate::simplex::Boundary<'a>,
-    _phantom1: PhantomData<&'a Simplex>,
-}
-
-impl<'a> Iterator for EnumerateBoundary<'a>
-{
-    type Item = (usize, Orientation);
-
-    fn next(&mut self) -> Option<Self::Item> {
-        match self.boundary.next() {
-            Some(face) => {
-                let pos = simplex_position(self.simplices.iter(), &face).unwrap();
+    pub fn boundary<I: FromIterator<(usize, Orientation)>>(&self, index: usize) -> I {
+        self.simplices[index].boundary()
+            .map(|face| {
+                let pos = simplex_position(self.simplices[0..index].iter(), &face).unwrap();
                 let sign = self.simplices[pos].orientation() * face.orientation();
-                Some((pos, sign))
-            },
-            None => None,
-        }
+                (pos, sign)
+            }).collect()
     }
 }
 
