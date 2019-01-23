@@ -63,11 +63,8 @@ fn main() {
     println!("");
 
     println!("Run the reduction");
-    let mut reduce = Z2ColumnReduce::<Z2VecVector>::new();
+    let reduce = simpcomp.boundaries().collect::<Z2ColumnReduce<Z2VecVector>>();
 
-    for i in simpcomp.range() {
-        reduce.push(simpcomp.boundary(i));
-    }
     println!("");
     println!("{:?}", reduce);
 

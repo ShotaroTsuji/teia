@@ -21,7 +21,7 @@ impl ComplexBuilder
 
     pub fn build(self) -> Option<Complex> {
         for index in 1..self.simplices.len() {
-            let result = check_boundary(&self.simplices[0..index], &self.simplices[index]);
+            let result = check_boundary(self.simplices[0..index].iter(), &self.simplices[index]);
             if result.is_none() {
                 return None;
             }
@@ -38,12 +38,12 @@ impl ComplexBuilder
     }
 }
 
-fn check_boundary<T>(simplices: T, simplex: &Simplex) -> Option<()>
+fn check_boundary<'a, T>(simplices: T, simplex: &Simplex) -> Option<()>
 where
-    T: AsRef<[Simplex]>,
+    T: Iterator<Item = &'a Simplex> + Clone,
 {
     for t in simplex.boundary() {
-        let pos = simplex_position(simplices.as_ref().iter(), &t);
+        let pos = simplex_position(simplices.clone(), &t);
         if pos.is_none() {
             return None;
         }

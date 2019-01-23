@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 use std::marker::PhantomData;
+use std::iter::FromIterator;
 use crate::Persistence;
 use crate::z2vector::Z2Vector;
 
@@ -52,6 +53,19 @@ where
         self.reduced.iter()
             .enumerate()
             .filter(|(_, c): &(usize, &V)| c.is_cycle())
+    }
+}
+
+impl<V> FromIterator<V> for Z2ColumnReduce<V>
+where
+    V: Z2Vector + std::fmt::Debug,
+{
+    fn from_iter<I: IntoIterator<Item=V>>(iter: I) -> Self {
+        let mut reduce = Z2ColumnReduce::new();
+        for vec in iter {
+            reduce.push(vec);
+        }
+        reduce
     }
 }
 
