@@ -14,6 +14,12 @@ pub trait Z2Vector {
 }
 
 #[derive(Debug, Clone)]
+pub struct Z2Chain<V> {
+    chain: V,
+    boundary: V,
+}
+
+#[derive(Debug, Clone)]
 pub struct Z2VecVector {
     // the elements must be sorted in the descending order.
     vec: Vec<usize>,
