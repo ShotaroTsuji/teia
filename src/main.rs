@@ -61,7 +61,7 @@ fn main() {
     println!("{}", simpcomp);
     println!("");
 
-    println!("Range: {:?}", simpcomp.range());
+    println!("Range: {:?}", simpcomp.index_range());
     for v in simpcomp.boundaries::<Z2VecVector>() {
         println!("{}", v);
     }
