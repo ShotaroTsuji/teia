@@ -3,6 +3,8 @@ pub mod complex;
 pub mod z2vector;
 pub mod z2reduce;
 
+pub mod reader;
+
 /// Persistence pair
 ///
 /// This struct represents persistence pair.
