@@ -1,12 +1,26 @@
 use teia::simplex::Simplex;
 use teia::simplex;
 use teia::Orientation;
+/*
 use teia::complex::ComplexBuilder;
 use teia::z2vector::Z2VecVector;
 use teia::z2vector::Z2Vector;
 use teia::z2reduce::{Z2ColumnReduce, Z2Pair};
+*/
+
+use teia::indexed_vec::IndexedVec;
+use teia::complex_new::Complex;
 
 fn main() {
+    let mut comp = Complex::new();
+
+    comp.push(simplex![+; 0]);
+    comp.push(simplex![+; 1]);
+    comp.push(simplex![+; 2]);
+
+    println!("{:?}", comp);
+
+    /*
     let mut x = Z2VecVector::new();
     let y: Z2VecVector = (vec![0, 1, 5]).into();
     let z: Z2VecVector = vec![2, 4, 5, 6].into();
@@ -84,6 +98,7 @@ fn main() {
     for (pers, _) in pair {
         println!("{:?}", pers);
     }
+    */
 }
 
 fn print_boundary(simp: Simplex) {

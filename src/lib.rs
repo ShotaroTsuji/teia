@@ -3,6 +3,9 @@ pub mod complex;
 pub mod z2vector;
 pub mod z2reduce;
 
+pub mod indexed_vec;
+pub mod complex_new;
+
 pub mod reader;
 
 /// Persistence pair
