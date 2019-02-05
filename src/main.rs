@@ -14,11 +14,12 @@ use teia::complex::Complex;
 fn main() {
     let mut comp = Complex::new();
 
-    comp.push(simplex![+; 0]);
-    comp.push(simplex![+; 1]);
-    comp.push(simplex![+; 2]);
+    comp.push(simplex![0]);
+    comp.push(simplex![1]);
+    comp.push(simplex![2]);
 
     println!("{:?}", comp);
+    println!("{:?}", comp.get(0));
 }
 
 fn print_boundary(simp: Simplex) {
