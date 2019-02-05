@@ -3,12 +3,9 @@ use crate::{IteratorExclude, Orientation};
 
 #[macro_export]
 macro_rules! simplex {
-    (+; $($x:expr),*) => (
-        $crate::simplex::Simplex::new(vec![$($x),*], $crate::Orientation::Positive)
+    ($($x:expr),*) => (
+        $crate::simplex::Simplex::new(vec![$($x),*])
     );
-    (-; $($x:expr),*) => (
-        $crate::simplex::Simplex::new(vec![$($x),*], $crate::Orientation::Negative)
-    )
 }
 
 /// The struct represents simplex
@@ -18,15 +15,10 @@ macro_rules! simplex {
 pub struct Simplex {
     /// The vertices ordered in descending order.
     vertices: Vec<usize>,
-    orientation: Orientation,
 }
 
 impl std::fmt::Display for Simplex {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self.orientation {
-            Orientation::Positive => { write!(f, "+")?; },
-            Orientation::Negative => { write!(f, "-")?; },
-        }
         write!(f, "< ")?;
         for v in self.vertices.iter() {
             write!(f, "{} ", v)?;
@@ -41,12 +33,11 @@ impl Simplex {
     /// This method creates a new simplex from vertices and orientation.
     /// The vertices are sorted in descending order by this method.
     /// The order of vertices in `vertices` is ignored.
-    pub fn new(mut vertices: Vec<usize>, ori: Orientation) -> Simplex {
+    pub fn new(mut vertices: Vec<usize>) -> Simplex {
         assert!(vertices.len() > 0);
         vertices.sort();
         Simplex {
             vertices: vertices,
-            orientation: ori,
         }
     }
 
@@ -65,11 +56,6 @@ impl Simplex {
     /// ```
     pub fn dimension(&self) -> usize {
         self.vertices.len() - 1
-    }
-
-    /// Returns the orientation of simplex
-    pub fn orientation(&self) -> Orientation {
-        self.orientation
     }
 
     /// Returns the reference to the slice of vertices
@@ -117,7 +103,6 @@ impl Simplex {
         Boundary {
             simplex: &self,
             index: 0,
-            ori: self.orientation,
             _phantom: PhantomData,
         }
     }
@@ -126,7 +111,6 @@ impl Simplex {
 pub struct Boundary<'a> {
     simplex: &'a Simplex,
     index: usize,
-    ori: Orientation,
     _phantom: PhantomData<&'a Simplex>,
 }
 
@@ -143,15 +127,12 @@ impl<'a> Iterator for Boundary<'a>
                 .exclude(self.index)
                 .map(|v| v.clone())
                 .collect::<Vec<usize>>();
-            let orientation = self.ori;
             self.index += 1;
-            self.ori = self.ori.flip();
             if boundary.len() == 0 {
                 None
             } else {
                 Some(Simplex {
                     vertices: boundary,
-                    orientation: orientation,
                 })
             }
         } else {
