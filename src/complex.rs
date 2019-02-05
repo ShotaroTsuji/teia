@@ -24,4 +24,8 @@ impl Complex {
     pub fn push(&mut self, elem: Simplex) {
         self.basis.push(elem);
     }
+
+    pub fn get(&self, index: usize) -> Option<&Simplex> {
+        self.basis.get(index)
+    }
 }

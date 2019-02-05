@@ -63,6 +63,14 @@ impl Simplex {
         &self.vertices[..]
     }
 
+    pub fn inner_prod(&self, other: &Simplex) -> usize {
+        if self.vertices == other.vertices {
+            1
+        } else {
+            0
+        }
+    }
+
     /// Checks whether `self` is a face of `other`
     ///
     /// It returns true if `self` is a face of `other`

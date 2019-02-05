@@ -19,7 +19,15 @@ fn main() {
     comp.push(simplex![2]);
 
     println!("{:?}", comp);
-    println!("{:?}", comp.get(0));
+
+    for i in 0..comp.len() {
+        for j in 0..comp.len() {
+            let si = comp.get(i).unwrap();
+            let sj = comp.get(j).unwrap();
+            println!("(s[{}], s[{}]) = {}", i, j, si.inner_prod(sj));
+        }
+        println!("");
+    }
 }
 
 fn print_boundary(simp: Simplex) {
