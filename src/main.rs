@@ -1,6 +1,5 @@
 use teia::simplex::Simplex;
 use teia::simplex;
-use teia::Orientation;
 /*
 use teia::complex::ComplexBuilder;
 use teia::z2vector::Z2VecVector;

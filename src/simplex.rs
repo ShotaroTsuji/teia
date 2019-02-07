@@ -1,5 +1,6 @@
 use std::marker::PhantomData;
-use crate::{IteratorExclude, Orientation};
+use crate::IteratorExclude;
+use crate::sign::Sign;
 
 #[macro_export]
 macro_rules! simplex {
@@ -63,11 +64,11 @@ impl Simplex {
         &self.vertices[..]
     }
 
-    pub fn inner_prod(&self, other: &Simplex) -> usize {
+    pub fn inner_prod(&self, other: &Simplex) -> Sign {
         if self.vertices == other.vertices {
-            1
+            Sign::positive()
         } else {
-            0
+            Sign::zero()
         }
     }
 
