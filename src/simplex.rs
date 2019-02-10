@@ -1,6 +1,7 @@
 use std::marker::PhantomData;
 use crate::IteratorExclude;
 use crate::sign::Sign;
+use crate::traits::ChainGenerator;
 
 #[macro_export]
 macro_rules! simplex {
@@ -41,6 +42,11 @@ impl Simplex {
             vertices: vertices,
         }
     }
+}
+
+impl<'a> ChainGenerator<'a> for Simplex {
+    type VerticesIter = Vertices<'a>;
+    type BoundaryIter = Boundary<'a>;
 
     /// Returns the dimension of simplex
     ///
@@ -55,16 +61,19 @@ impl Simplex {
     /// let s = Simplex::new(vec![3, 4, 8, 10], Orientation::Positive);
     /// assert_eq!(s.dimension(), 3);
     /// ```
-    pub fn dimension(&self) -> usize {
+    fn dimension(&self) -> usize {
         self.vertices.len() - 1
     }
 
     /// Returns the reference to the slice of vertices
-    pub fn vertices(&self) -> &[usize] {
-        &self.vertices[..]
+    fn vertices(&'a self) -> Vertices<'a> {
+        Vertices {
+            iter: self.vertices.iter(),
+            _phantom: PhantomData,
+        }
     }
 
-    pub fn inner_prod(&self, other: &Simplex) -> Sign {
+    fn inner_prod(&self, other: &Simplex) -> Sign {
         if self.vertices == other.vertices {
             Sign::positive()
         } else {
@@ -86,7 +95,7 @@ impl Simplex {
     /// let t = Simplex::new(vec![1,3], Orientation::Positive);
     /// assert_eq!(t.is_face_of(&s), true);
     /// ```
-    pub fn is_face_of(&self, other: &Simplex) -> bool {
+    fn is_face_of(&self, other: &Simplex) -> bool {
         self.vertices
             .iter()
             .all(|v| other.vertices.binary_search(v).is_ok())
@@ -108,12 +117,25 @@ impl Simplex {
     /// assert_eq!(b.next(), Some(simplex![-; 0, 1, 2]));
     /// assert_eq!(b.next(), None);
     /// ```
-    pub fn boundary(&self) -> Boundary {
+    fn boundary(&self) -> Boundary {
         Boundary {
             simplex: &self,
             index: 0,
             _phantom: PhantomData,
         }
+    }
+}
+
+pub struct Vertices<'a> {
+    iter: std::slice::Iter<'a, usize>,
+    _phantom: PhantomData<&'a usize>,
+}
+
+impl<'a> Iterator for Vertices<'a> {
+    type Item = &'a usize;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next()
     }
 }
 

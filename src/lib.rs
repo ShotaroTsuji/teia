@@ -3,6 +3,7 @@ pub mod complex;
 //pub mod z2vector;
 //pub mod z2reduce;
 
+pub mod traits;
 pub mod indexed_vec;
 pub mod sign;
 
