@@ -1,10 +1,10 @@
 use teia::simplex::Simplex;
 use teia::simplex;
-use teia::sign::Sign;
 use teia::traits::ChainGenerator;
 use teia::traits::IndexedSet;
 use teia::indexed_vec::IndexedVec;
 use teia::complex;
+use teia::complex::Complex;
 use teia::z2vector::{Z2VecVector, Z2Vector};
 
 fn test_simplex() {
@@ -35,7 +35,7 @@ fn test_simplex() {
 
 fn test_complex() {
     println!("# test_complex");
-    let mut comp = IndexedVec::new(0);
+    let mut comp: Complex<IndexedVec<_>, _> = Complex::new();
 
     comp.push(simplex![0]);
     comp.push(simplex![1]);
@@ -49,19 +49,19 @@ fn test_complex() {
     println!("{:?}", comp);
 
     println!("Iterator");
-    for t in comp.iter() {
+    for t in comp.basis.iter() {
         println!("{:?}", t);
     }
 
     println!("Range(3..6)");
-    for t in comp.range(3..6) {
+    for t in comp.basis.range(3..6) {
         println!("{:?}", t);
     }
 
     println!("compute_boundary");
-    for index in comp.index_range() {
+    for index in comp.basis.index_range() {
         println!("  index = {}, range = {:?}", index, 0..index);
-        let res: Option<Z2VecVector> = complex::compute_boundary(comp.range(0..index), &comp[index]);
+        let res: Option<Z2VecVector> = complex::compute_boundary(comp.basis.range(0..index), &comp.basis[index]);
         println!("  -> {:?}", res);
     }
 }

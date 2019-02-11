@@ -6,19 +6,17 @@ pub struct IndexedVec<T> {
     start: usize,
 }
 
-impl<T> IndexedVec<T> {
+impl<'a, T: 'a> IndexedSet<'a, T> for IndexedVec<T> {
+    type Iter = Iter<'a, T>;
+    type Range = Range<'a, T>;
+
     #[inline]
-    pub fn new(start: usize) -> Self {
+    fn new(start: usize) -> Self {
         IndexedVec {
             vec: Vec::new(),
             start: start,
         }
     }
-}
-
-impl<'a, T: 'a> IndexedSet<'a, T> for IndexedVec<T> {
-    type Iter = Iter<'a, T>;
-    type Range = Range<'a, T>;
 
     #[inline]
     fn from_vec(vec: Vec<T>, start: usize) -> Self {

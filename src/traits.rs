@@ -16,6 +16,7 @@ pub trait IndexedSet<'a, T: 'a> {
     type Iter: Iterator<Item=(usize, &'a T)>;
     type Range: Iterator<Item=(usize, &'a T)>;
 
+    fn new(index: usize) -> Self;
     fn from_vec(vec: Vec<T>, start: usize) -> Self;
     fn len(&self) -> usize;
     fn index_start(&self) -> usize;
