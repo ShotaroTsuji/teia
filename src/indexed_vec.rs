@@ -1,4 +1,4 @@
-use crate::simplex::Simplex;
+use crate::traits::IndexedSet;
 
 #[derive(Debug,Clone)]
 pub struct IndexedVec<T> {
@@ -14,9 +14,13 @@ impl<T> IndexedVec<T> {
             start: start,
         }
     }
+}
+
+impl<'a, T: 'a> IndexedSet<'a, T> for IndexedVec<T> {
+    type Iter = Iter<'a, T>;
 
     #[inline]
-    pub fn from_vec(vec: Vec<T>, start: usize) -> Self {
+    fn from_vec(vec: Vec<T>, start: usize) -> Self {
         IndexedVec {
             vec: vec,
             start: start,
@@ -24,37 +28,42 @@ impl<T> IndexedVec<T> {
     }
 
     #[inline]
-    pub fn index_start(&self) -> usize {
+    fn len(&self) -> usize {
+        self.vec.len()
+    }
+
+    #[inline]
+    fn index_start(&self) -> usize {
         self.start
     }
 
     #[inline]
-    pub fn index_end(&self) -> usize {
+    fn index_end(&self) -> usize {
         self.start + self.vec.len()
     }
 
     #[inline]
-    pub fn index_range(&self) -> std::ops::Range<usize> {
+    fn index_range(&self) -> std::ops::Range<usize> {
         self.start..(self.start+self.vec.len())
     }
 
     #[inline]
-    pub fn push(&mut self, elem: T) {
+    fn push(&mut self, elem: T) {
         self.vec.push(elem);
     }
 
     #[inline]
-    pub fn get(&self, index: usize) -> Option<&T> {
+    fn get(&self, index: usize) -> Option<&T> {
         self.vec.get(index-self.start)
     }
 
     #[inline]
-    pub fn get_mut(&mut self, index: usize) -> Option<&mut T> {
+    fn get_mut(&mut self, index: usize) -> Option<&mut T> {
         self.vec.get_mut(index-self.start)
     }
 
     #[inline]
-    pub fn iter(&self) -> Iter<T> {
+    fn iter(&'a self) -> Iter<'a, T> {
         Iter {
             ivec: &self,
             index: self.start,
@@ -142,13 +151,13 @@ impl<T> std::ops::IndexMut<std::ops::RangeTo<usize>> for IndexedVec<T> {
 impl<T> std::ops::Index<std::ops::RangeFull> for IndexedVec<T> {
     type Output = [T];
 
-    fn index(&self, index: std::ops::RangeFull) -> &Self::Output {
+    fn index(&self, _index: std::ops::RangeFull) -> &Self::Output {
         &self.vec[..]
     }
 }
 
 impl<T> std::ops::IndexMut<std::ops::RangeFull> for IndexedVec<T> {
-    fn index_mut(&mut self, index: std::ops::RangeFull) -> &mut [T] {
+    fn index_mut(&mut self, _index: std::ops::RangeFull) -> &mut [T] {
         &mut self.vec[..]
     }
 }

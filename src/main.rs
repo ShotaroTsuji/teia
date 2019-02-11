@@ -2,9 +2,9 @@ use teia::simplex::Simplex;
 use teia::simplex;
 use teia::sign::Sign;
 use teia::traits::ChainGenerator;
+use teia::traits::IndexedSet;
 
 use teia::indexed_vec::IndexedVec;
-use teia::complex::Complex;
 
 fn test_simplex() {
     println!("# test_simplex");
@@ -32,19 +32,26 @@ fn test_simplex() {
     println!("u.is_face_of(&s) = {}", u.is_face_of(&s));
 }
 
-fn main() {
-    test_simplex();
-    println!("");
-
+fn test_complex() {
     println!("# test_complex");
-    let mut comp = Complex::new();
+    let mut comp = IndexedVec::new(0);
 
     comp.push(simplex![0]);
     comp.push(simplex![1]);
     comp.push(simplex![2]);
+    comp.push(simplex![0,1]);
+    comp.push(simplex![0,2]);
+    comp.push(simplex![1,2]);
+    comp.push(simplex![1,2,3]);
 
     println!("{:?}", comp);
 
+    println!("Iterator");
+    for t in comp.iter() {
+        println!("{:?}", t);
+    }
+
+    println!("Inner prod");
     for i in 0..comp.len() {
         for j in 0..comp.len() {
             let si = comp.get(i).unwrap();
@@ -53,13 +60,13 @@ fn main() {
         }
         println!("");
     }
+
 }
 
-fn print_boundary(simp: Simplex) {
-    println!("simplex: {}", simp);
-    println!("dimension = {}", simp.dimension());
-    println!("boudnary = ");
-    for t in simp.boundary() {
-        println!("  {}", t);
-    }
+fn main() {
+    test_simplex();
+    println!("");
+
+    test_complex();
+    println!("");
 }

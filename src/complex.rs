@@ -1,15 +1,22 @@
 use crate::indexed_vec::IndexedVec;
 use crate::simplex::Simplex;
+use crate::traits::IndexedSet;
 
 #[derive(Debug, Clone)]
 pub struct Complex {
-    basis: Vec<Simplex>,
+    basis: IndexedVec<Simplex>,
 }
 
 impl Complex {
     pub fn new() -> Self {
         Complex {
-            basis: Vec::new(),
+            basis: IndexedVec::new(0),
+        }
+    }
+
+    pub fn with_start_index(start: usize) -> Self {
+        Complex {
+            basis: IndexedVec::new(start),
         }
     }
 
@@ -18,7 +25,7 @@ impl Complex {
     }
 
     pub fn index_range(&self) -> std::ops::Range<usize> {
-        0..self.basis.len()
+        self.basis.index_range()
     }
 
     pub fn push(&mut self, elem: Simplex) {
