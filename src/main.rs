@@ -3,8 +3,9 @@ use teia::simplex;
 use teia::sign::Sign;
 use teia::traits::ChainGenerator;
 use teia::traits::IndexedSet;
-
 use teia::indexed_vec::IndexedVec;
+use teia::complex;
+use teia::z2vector::{Z2VecVector, Z2Vector};
 
 fn test_simplex() {
     println!("# test_simplex");
@@ -42,7 +43,8 @@ fn test_complex() {
     comp.push(simplex![0,1]);
     comp.push(simplex![0,2]);
     comp.push(simplex![1,2]);
-    comp.push(simplex![1,2,3]);
+    comp.push(simplex![0,1,2]);
+    comp.push(simplex![0,1,2,3]);
 
     println!("{:?}", comp);
 
@@ -54,6 +56,13 @@ fn test_complex() {
     println!("Range(3..6)");
     for t in comp.range(3..6) {
         println!("{:?}", t);
+    }
+
+    println!("compute_boundary");
+    for index in comp.index_range() {
+        println!("  index = {}, range = {:?}", index, 0..index);
+        let res: Option<Z2VecVector> = complex::compute_boundary(comp.range(0..index), &comp[index]);
+        println!("  -> {:?}", res);
     }
 }
 

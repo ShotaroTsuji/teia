@@ -1,38 +1,21 @@
-use crate::indexed_vec::IndexedVec;
-use crate::simplex::Simplex;
-use crate::traits::IndexedSet;
+use crate::sign::Sign;
+use crate::traits::{ChainGenerator, IndexedSet};
 
-#[derive(Debug, Clone)]
-pub struct Complex {
-    basis: IndexedVec<Simplex>,
-}
-
-impl Complex {
-    pub fn new() -> Self {
-        Complex {
-            basis: IndexedVec::new(0),
-        }
-    }
-
-    pub fn with_start_index(start: usize) -> Self {
-        Complex {
-            basis: IndexedVec::new(start),
-        }
-    }
-
-    pub fn len(&self) -> usize {
-        self.basis.len()
-    }
-
-    pub fn index_range(&self) -> std::ops::Range<usize> {
-        self.basis.index_range()
-    }
-
-    pub fn push(&mut self, elem: Simplex) {
-        self.basis.push(elem);
-    }
-
-    pub fn get(&self, index: usize) -> Option<&Simplex> {
-        self.basis.get(index)
-    }
+pub fn compute_boundary<'a, 'b: 'a, I, G, V>(iter: I, elem: &'b G) -> Option<V>
+where
+    G: 'a + ChainGenerator<'a> + PartialEq,
+    I: Iterator<Item=(usize, &'a G)> + Clone,
+    V: std::iter::FromIterator<(usize, Sign)>,
+{
+    elem.boundary()
+        .map(|face| {
+            iter.clone().find_map(|(i, s)| {
+                let sign = face.inner_prod(s);
+                if sign.is_zero() {
+                    None
+                } else {
+                    Some((i, sign))
+                }
+            })
+        }).collect()
 }

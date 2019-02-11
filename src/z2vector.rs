@@ -1,5 +1,5 @@
 use std::iter::FromIterator;
-use crate::Orientation;
+use crate::sign::Sign;
 
 /// The trait describes the operations on Z2Vector
 pub trait Z2Vector {
@@ -89,10 +89,10 @@ impl Z2Vector for Z2VecVector {
     }
 }
 
-impl FromIterator<(usize, Orientation)> for Z2VecVector {
-    fn from_iter<I: IntoIterator<Item=(usize, Orientation)>>(iter: I) -> Self {
+impl FromIterator<(usize, Sign)> for Z2VecVector {
+    fn from_iter<I: IntoIterator<Item=(usize, Sign)>>(iter: I) -> Self {
         let mut vec = Vec::new();
-        for (pos, _ori) in iter {
+        for (pos, _sign) in iter {
             vec.push(pos);
         }
         vec.sort_by(|a, b| b.cmp(a));

@@ -16,6 +16,30 @@ impl Sign {
     pub fn zero() -> Sign {
         Sign(0)
     }
+
+    #[inline]
+    pub fn is_positive(&self) -> bool {
+        self.0 > 0
+    }
+
+    #[inline]
+    pub fn is_negative(&self) -> bool {
+        self.0 < 0
+    }
+
+    #[inline]
+    pub fn is_zero(&self) -> bool {
+        self.0 == 0
+    }
+
+    #[inline]
+    pub fn into_option(self) -> Option<Sign> {
+        if self.0 == 0 {
+            None
+        } else {
+            Some(self)
+        }
+    }
 }
 
 impl std::ops::Mul<Sign> for Sign {

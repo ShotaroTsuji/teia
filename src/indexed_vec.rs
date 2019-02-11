@@ -63,6 +63,15 @@ impl<'a, T: 'a> IndexedSet<'a, T> for IndexedVec<T> {
         self.vec.get_mut(index-self.start)
     }
 
+    fn position_within(&self, range: std::ops::Range<usize>, elem: &T) -> Option<usize> where T: PartialEq {
+        for index in range {
+            if self[index] == *elem {
+                return Some(index);
+            }
+        }
+        None
+    }
+
     #[inline]
     fn iter(&'a self) -> Iter<'a, T> {
         Iter {
@@ -83,6 +92,7 @@ impl<'a, T: 'a> IndexedSet<'a, T> for IndexedVec<T> {
     }
 }
 
+#[derive(Debug,Clone)]
 pub struct Iter<'a, T> {
     ivec: &'a IndexedVec<T>,
     index: usize,
@@ -103,6 +113,7 @@ impl<'a, T> Iterator for Iter<'a, T> {
     }
 }
 
+#[derive(Debug,Clone)]
 pub struct Range<'a, T> {
     ivec: &'a IndexedVec<T>,
     index: usize,

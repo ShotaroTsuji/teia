@@ -1,6 +1,6 @@
 pub mod simplex;
 pub mod complex;
-//pub mod z2vector;
+pub mod z2vector;
 //pub mod z2reduce;
 
 pub mod traits;
