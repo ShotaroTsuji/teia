@@ -18,6 +18,7 @@ impl<T> IndexedVec<T> {
 
 impl<'a, T: 'a> IndexedSet<'a, T> for IndexedVec<T> {
     type Iter = Iter<'a, T>;
+    type Range = Range<'a, T>;
 
     #[inline]
     fn from_vec(vec: Vec<T>, start: usize) -> Self {
@@ -70,6 +71,16 @@ impl<'a, T: 'a> IndexedSet<'a, T> for IndexedVec<T> {
             _phantom: std::marker::PhantomData,
         }
     }
+
+    #[inline]
+    fn range(&'a self, range: std::ops::Range<usize>) -> Range<'a, T> {
+        Range {
+            ivec: &self,
+            index: range.start,
+            end: range.end,
+            _phantom: std::marker::PhantomData,
+        }
+    }
 }
 
 pub struct Iter<'a, T> {
@@ -83,6 +94,27 @@ impl<'a, T> Iterator for Iter<'a, T> {
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.ivec.index_end() {
+            let pair = (self.index, &self.ivec[self.index]);
+            self.index += 1;
+            Some(pair)
+        } else {
+            None
+        }
+    }
+}
+
+pub struct Range<'a, T> {
+    ivec: &'a IndexedVec<T>,
+    index: usize,
+    end: usize,
+    _phantom: std::marker::PhantomData<&'a IndexedVec<T>>,
+}
+
+impl<'a, T> Iterator for Range<'a, T> {
+    type Item = (usize, &'a T);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.end {
             let pair = (self.index, &self.ivec[self.index]);
             self.index += 1;
             Some(pair)

@@ -51,16 +51,10 @@ fn test_complex() {
         println!("{:?}", t);
     }
 
-    println!("Inner prod");
-    for i in 0..comp.len() {
-        for j in 0..comp.len() {
-            let si = comp.get(i).unwrap();
-            let sj = comp.get(j).unwrap();
-            println!("(s[{}], s[{}]) = {}", i, j, si.inner_prod(sj));
-        }
-        println!("");
+    println!("Range(3..6)");
+    for t in comp.range(3..6) {
+        println!("{:?}", t);
     }
-
 }
 
 fn main() {

@@ -13,6 +13,7 @@ pub trait ChainGenerator<'a> {
 
 pub trait IndexedSet<'a, T: 'a> {
     type Iter: Iterator<Item=(usize, &'a T)>;
+    type Range: Iterator<Item=(usize, &'a T)>;
 
     fn from_vec(vec: Vec<T>, start: usize) -> Self;
     fn len(&self) -> usize;
@@ -23,4 +24,5 @@ pub trait IndexedSet<'a, T: 'a> {
     fn get(&self, index: usize) -> Option<&T>;
     fn get_mut(&mut self, index: usize) -> Option<&mut T>;
     fn iter(&'a self) -> Self::Iter;
+    fn range(&'a self, range: std::ops::Range<usize>) -> Self::Range;
 }
