@@ -1,5 +1,5 @@
 use crate::sign::Sign;
-use crate::traits::ChainGenerator;
+use crate::traits::*;
 use crate::IteratorExclude;
 use std::marker::PhantomData;
 
@@ -42,10 +42,32 @@ impl Simplex {
     }
 }
 
-impl<'a> ChainGenerator<'a> for Simplex {
+impl<'a> ChainGeneratorVertices<'a> for Simplex {
     type VerticesIter = Vertices<'a>;
+
+    /// Returns the reference to the slice of vertices
+    fn vertices(&'a self) -> Vertices<'a> {
+        Vertices {
+            iter: self.vertices.iter(),
+            _phantom: PhantomData,
+        }
+    }
+}
+
+impl<'a> ChainGeneratorBoundary<'a> for Simplex {
     type BoundaryIter = Boundary<'a>;
 
+    fn boundary(&self) -> Boundary {
+        Boundary {
+            simplex: &self,
+            index: 0,
+            _phantom: PhantomData,
+        }
+    }
+}
+
+
+impl ChainGenerator for Simplex {
     /// Returns the dimension of simplex
     ///
     /// # Example
@@ -61,14 +83,6 @@ impl<'a> ChainGenerator<'a> for Simplex {
     /// ```
     fn dimension(&self) -> usize {
         self.vertices.len() - 1
-    }
-
-    /// Returns the reference to the slice of vertices
-    fn vertices(&'a self) -> Vertices<'a> {
-        Vertices {
-            iter: self.vertices.iter(),
-            _phantom: PhantomData,
-        }
     }
 
     fn inner_prod(&self, other: &Simplex) -> Sign {
@@ -99,29 +113,6 @@ impl<'a> ChainGenerator<'a> for Simplex {
             .all(|v| other.vertices.binary_search(v).is_ok())
     }
 
-    /// Computes the boundary of simplex
-    ///
-    /// This method returns an iterator that computes the boundary of simplex.
-    ///
-    /// # Example
-    /// ```
-    /// use teia::simplex;
-    ///
-    /// let s = simplex![+; 0, 1, 2, 3];
-    /// let mut b = s.boundary();
-    /// assert_eq!(b.next(), Some(simplex![+; 1, 2, 3]));
-    /// assert_eq!(b.next(), Some(simplex![-; 0, 2, 3]));
-    /// assert_eq!(b.next(), Some(simplex![+; 0, 1, 3]));
-    /// assert_eq!(b.next(), Some(simplex![-; 0, 1, 2]));
-    /// assert_eq!(b.next(), None);
-    /// ```
-    fn boundary(&self) -> Boundary {
-        Boundary {
-            simplex: &self,
-            index: 0,
-            _phantom: PhantomData,
-        }
-    }
 }
 
 pub struct Vertices<'a> {

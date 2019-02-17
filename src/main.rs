@@ -1,11 +1,10 @@
-use teia::complex;
-use teia::complex::BoundaryFacesPositions;
-use teia::complex::Complex;
+//use teia::complex;
+//use teia::complex::BoundaryFacesPositions;
+//use teia::complex::Complex;
 use teia::indexed_vec::IndexedVec;
 use teia::simplex;
 use teia::simplex::Simplex;
-use teia::traits::ChainGenerator;
-use teia::traits::IndexedSet;
+use teia::traits::*;
 use teia::z2vector::{Z2VecVector, Z2Vector};
 
 fn test_simplex() {
@@ -34,6 +33,7 @@ fn test_simplex() {
     println!("u.is_face_of(&s) = {}", u.is_face_of(&s));
 }
 
+/*
 fn test_complex() {
     println!("# test_complex");
     let mut comp: Complex<IndexedVec<_>, _> = Complex::new();
@@ -90,11 +90,12 @@ fn test_complex() {
         println!("{:?}", chain);
     }
 }
+*/
 
 fn main() {
     test_simplex();
     println!("");
 
-    test_complex();
+    //test_complex();
     println!("");
 }
