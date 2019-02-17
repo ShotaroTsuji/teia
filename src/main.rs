@@ -78,7 +78,8 @@ fn test_complex() {
     println!("BoundaryFacesPositions");
     {
         let simp = simplex![0,1,2];
-        let iter = BoundaryFacesPositions::new(comp.basis.range(3..6), &simp);
+        let range = comp.basis.range(3..6);
+        let iter = BoundaryFacesPositions::new(range, &simp);
         for item in iter {
             println!("  {:?}", item);
         }
