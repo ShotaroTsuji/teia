@@ -1,5 +1,12 @@
 use crate::sign::Sign;
 use crate::traits::{ChainGenerator, IndexedSet};
+use failure::Fail;
+
+#[derive(Debug, Fail)]
+pub enum ComplexError {
+    #[fail(display = "complex is not filtered")]
+    ComplexIsNotFiltered,
+}
 
 #[derive(Debug, Clone)]
 pub struct Complex<'a, V, G> {
@@ -21,6 +28,47 @@ where
 
     pub fn push(&mut self, elem: G) {
         self.basis.push(elem);
+    }
+
+    pub fn boundaries<C>(&'a self) -> Boundaries<'a, V, G, C> {
+        Boundaries {
+            index: self.basis.index_start(),
+            complex: self,
+            _phantom0: std::marker::PhantomData,
+            _phantom1: std::marker::PhantomData,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct Boundaries<'a, V, G, C> {
+    index: usize,
+    complex: &'a Complex<'a, V, G>,
+    _phantom0: std::marker::PhantomData<&'a G>,
+    _phantom1: std::marker::PhantomData<fn() -> C>,
+}
+
+impl<'a, V, G, C> Iterator for Boundaries<'a, V, G, C>
+where
+    V: IndexedSet<'a, G> + std::ops::Index<usize, Output = G>,
+    <V as IndexedSet<'a, G>>::Range: Clone,
+    G: ChainGenerator<'a> + PartialEq,
+    C: std::iter::FromIterator<(usize, Sign)>,
+{
+    type Item = Result<C, ComplexError>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.complex.basis.index_end() {
+            let chain: Option<C> = BoundaryFacesPositions::new(
+                self.complex.basis.range(0..self.index),
+                &self.complex.basis[self.index],
+            )
+            .collect();
+            self.index += 1;
+            Some(chain.ok_or(ComplexError::ComplexIsNotFiltered))
+        } else {
+            None
+        }
     }
 }
 

@@ -74,6 +74,11 @@ fn test_complex() {
         let res: Option<Z2VecVector> = iter.collect();
         println!("  -> {:?}", res);
     }
+
+    println!("boundaries()");
+    for chain in comp.boundaries::<Z2VecVector>() {
+        println!("{:?}", chain);
+    }
 }
 
 fn main() {
