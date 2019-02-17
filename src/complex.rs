@@ -38,6 +38,17 @@ where
             _phantom1: std::marker::PhantomData,
         }
     }
+
+    pub fn boundaries_from<C, W>(&'a self, other: &'a Complex<'a, W, G>) -> BoundariesFrom<'a, 'a, V, W, G, C> {
+        BoundariesFrom {
+            index: self.basis.index_start(),
+            complex: self,
+            other: other,
+            _phantom0: std::marker::PhantomData,
+            _phantom1: std::marker::PhantomData,
+            _phantom2: std::marker::PhantomData,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -73,18 +84,58 @@ where
 }
 
 #[derive(Debug, Clone)]
+pub struct BoundariesFrom<'a, 'b, V, W, G, C> {
+    index: usize,
+    complex: &'b Complex<'b, V, G>,
+    other: &'a Complex<'a, W, G>,
+    _phantom0: std::marker::PhantomData<&'a G>,
+    _phantom1: std::marker::PhantomData<&'b G>,
+    _phantom2: std::marker::PhantomData<fn() -> C>,
+}
+
+impl<'a, 'b: 'a, V, W, G, C> Iterator for BoundariesFrom<'a, 'b, V, W, G, C>
+where
+    V: IndexedSet<'b, G> + std::ops::Index<usize, Output = G>,
+    W: IndexedSet<'a, G>,
+    <W as IndexedSet<'a, G>>::Range: Clone,
+    G: ChainGenerator<'b> + PartialEq,
+    C: std::iter::FromIterator<(usize, Sign)>,
+{
+    type Item = Result<C, ComplexError>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.complex.basis.index_end() {
+            let chain: Option<C> = BoundaryFacesPositions::new(
+                self.other.basis.range(0..self.index),
+                &self.complex.basis[self.index],
+            )
+            .collect();
+            self.index += 1;
+            Some(chain.ok_or(ComplexError::ComplexIsNotFiltered))
+        } else {
+            None
+        }
+    }
+}
+
+
+/// An iterator that produces pairs of the position and the sign of the boundary of the given
+/// simplex.
+#[derive(Debug, Clone)]
 pub struct BoundaryFacesPositions<Iter, BdIter> {
+    /// An iterator from which this struct find generators.
     iter: Iter,
+    /// An iterator that produces the faces of the boundary.
     boundary: BdIter,
 }
 
-impl<'a, Iter, BdIter, ChGen> BoundaryFacesPositions<Iter, BdIter>
+impl<'a, 'b, Iter, BdIter, ChGen> BoundaryFacesPositions<Iter, BdIter>
 where
     Iter: Iterator<Item = (usize, &'a ChGen)> + Clone,
-    ChGen: 'a + ChainGenerator<'a, BoundaryIter = BdIter> + PartialEq,
+    ChGen: 'a + ChainGenerator<'b, BoundaryIter = BdIter> + PartialEq,
     BdIter: Iterator<Item = ChGen>,
 {
-    pub fn new(iter: Iter, elem: &'a ChGen) -> Self {
+    pub fn new(iter: Iter, elem: &'b ChGen) -> Self {
         BoundaryFacesPositions {
             iter: iter,
             boundary: elem.boundary(),
@@ -92,10 +143,10 @@ where
     }
 }
 
-impl<'a, Iter, BdIter, ChGen> Iterator for BoundaryFacesPositions<Iter, BdIter>
+impl<'a, 'b, Iter, BdIter, ChGen> Iterator for BoundaryFacesPositions<Iter, BdIter>
 where
     Iter: Iterator<Item = (usize, &'a ChGen)> + Clone,
-    ChGen: 'a + ChainGenerator<'a, BoundaryIter = BdIter> + PartialEq,
+    ChGen: 'a + ChainGenerator<'b, BoundaryIter = BdIter> + PartialEq,
     BdIter: Iterator<Item = ChGen>,
 {
     type Item = Option<(usize, Sign)>;

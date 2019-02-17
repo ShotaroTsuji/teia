@@ -75,6 +75,15 @@ fn test_complex() {
         println!("  -> {:?}", res);
     }
 
+    println!("BoundaryFacesPositions");
+    {
+        let simp = simplex![0,1,2];
+        let iter = BoundaryFacesPositions::new(comp.basis.range(3..6), &simp);
+        for item in iter {
+            println!("  {:?}", item);
+        }
+    }
+
     println!("boundaries()");
     for chain in comp.boundaries::<Z2VecVector>() {
         println!("{:?}", chain);
