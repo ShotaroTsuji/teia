@@ -1,5 +1,5 @@
-use teia::simplex;
 use teia::complex::ComplexBuilder;
+use teia::simplex;
 use teia::z2vector::Z2VecVector;
 
 fn main() {
@@ -49,8 +49,10 @@ fn main() {
     println!("");
 
     println!("boundary_from method");
-    println!("boundary_from(range(0..3), 3) = {:?}",
-        comp.boundary_from::<Z2VecVector, _>(comp.range(0..3), 3));
+    println!(
+        "boundary_from(range(0..3), 3) = {:?}",
+        comp.boundary_from::<Z2VecVector, _>(comp.range(0..3), 3)
+    );
     println!("");
 
     println!("boundaries method");
@@ -76,7 +78,6 @@ fn main() {
 
     let mut builder = ComplexBuilder::new();
     builder.base_index(comp0.index_range().end);
-
 
     println!("Complex of dimension 0");
     println!("{}", comp0);

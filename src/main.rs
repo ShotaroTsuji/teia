@@ -1,16 +1,17 @@
-use teia::simplex::Simplex;
+use teia::complex;
+use teia::complex::BoundaryFacesPositions;
+use teia::complex::Complex;
+use teia::indexed_vec::IndexedVec;
 use teia::simplex;
+use teia::simplex::Simplex;
 use teia::traits::ChainGenerator;
 use teia::traits::IndexedSet;
-use teia::indexed_vec::IndexedVec;
-use teia::complex;
-use teia::complex::Complex;
 use teia::z2vector::{Z2VecVector, Z2Vector};
 
 fn test_simplex() {
     println!("# test_simplex");
 
-    let s = simplex![0,1,2,3];
+    let s = simplex![0, 1, 2, 3];
     println!("s = {}", s);
 
     println!("s.dimension() = {}", s.dimension());
@@ -23,12 +24,12 @@ fn test_simplex() {
         println!("  {}", t);
     }
 
-    let t = simplex![1,3];
+    let t = simplex![1, 3];
     println!("t = {}", t);
     println!("t.is_face_of(&s) = {}", t.is_face_of(&s));
     println!("s.inner_prod(&t) = {}", s.inner_prod(&t));
 
-    let u = simplex![1,4];
+    let u = simplex![1, 4];
     println!("u = {}", u);
     println!("u.is_face_of(&s) = {}", u.is_face_of(&s));
 }
@@ -40,11 +41,11 @@ fn test_complex() {
     comp.push(simplex![0]);
     comp.push(simplex![1]);
     comp.push(simplex![2]);
-    comp.push(simplex![0,1]);
-    comp.push(simplex![0,2]);
-    comp.push(simplex![1,2]);
-    comp.push(simplex![0,1,2]);
-    comp.push(simplex![0,1,2,3]);
+    comp.push(simplex![0, 1]);
+    comp.push(simplex![0, 2]);
+    comp.push(simplex![1, 2]);
+    comp.push(simplex![0, 1, 2]);
+    comp.push(simplex![0, 1, 2, 3]);
 
     println!("{:?}", comp);
 
@@ -61,7 +62,16 @@ fn test_complex() {
     println!("compute_boundary");
     for index in comp.basis.index_range() {
         println!("  index = {}, range = {:?}", index, 0..index);
-        let res: Option<Z2VecVector> = complex::compute_boundary(comp.basis.range(0..index), &comp.basis[index]);
+        let res: Option<Z2VecVector> =
+            complex::compute_boundary(comp.basis.range(0..index), &comp.basis[index]);
+        println!("  -> {:?}", res);
+    }
+
+    println!("BoundaryFacesPositions");
+    for index in comp.basis.index_range() {
+        println!("  index = {}, range = {:?}", index, 0..index);
+        let iter = BoundaryFacesPositions::new(comp.basis.range(0..index), &comp.basis[index]);
+        let res: Option<Z2VecVector> = iter.collect();
         println!("  -> {:?}", res);
     }
 }

@@ -1,7 +1,7 @@
-use std::marker::PhantomData;
-use crate::IteratorExclude;
 use crate::sign::Sign;
 use crate::traits::ChainGenerator;
+use crate::IteratorExclude;
+use std::marker::PhantomData;
 
 #[macro_export]
 macro_rules! simplex {
@@ -38,9 +38,7 @@ impl Simplex {
     pub fn new(mut vertices: Vec<usize>) -> Simplex {
         assert!(vertices.len() > 0);
         vertices.sort();
-        Simplex {
-            vertices: vertices,
-        }
+        Simplex { vertices: vertices }
     }
 }
 
@@ -145,8 +143,7 @@ pub struct Boundary<'a> {
     _phantom: PhantomData<&'a Simplex>,
 }
 
-impl<'a> Iterator for Boundary<'a>
-{
+impl<'a> Iterator for Boundary<'a> {
     type Item = Simplex;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -162,16 +159,13 @@ impl<'a> Iterator for Boundary<'a>
             if boundary.len() == 0 {
                 None
             } else {
-                Some(Simplex {
-                    vertices: boundary,
-                })
+                Some(Simplex { vertices: boundary })
             }
         } else {
             None
         }
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -180,13 +174,17 @@ mod tests {
 
     #[test]
     fn test_simplex_boundary() {
-        let simplex = Simplex::new(vec![0,1,2,3], Orientation::Positive);
+        let simplex = Simplex::new(vec![0, 1, 2, 3], Orientation::Positive);
         let boundary = simplex.boundary().collect::<Vec<Simplex>>();
-        assert_eq!(boundary,
-                   vec![Simplex::new(vec![1,2,3], Orientation::Positive),
-                        Simplex::new(vec![0,2,3], Orientation::Negative),
-                        Simplex::new(vec![0,1,3], Orientation::Positive),
-                        Simplex::new(vec![0,1,2], Orientation::Negative)]);
+        assert_eq!(
+            boundary,
+            vec![
+                Simplex::new(vec![1, 2, 3], Orientation::Positive),
+                Simplex::new(vec![0, 2, 3], Orientation::Negative),
+                Simplex::new(vec![0, 1, 3], Orientation::Positive),
+                Simplex::new(vec![0, 1, 2], Orientation::Negative)
+            ]
+        );
     }
 
     #[test]

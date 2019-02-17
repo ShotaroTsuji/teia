@@ -1,6 +1,6 @@
 use crate::traits::IndexedSet;
 
-#[derive(Debug,Clone)]
+#[derive(Debug, Clone)]
 pub struct IndexedVec<T> {
     vec: Vec<T>,
     start: usize,
@@ -43,7 +43,7 @@ impl<'a, T: 'a> IndexedSet<'a, T> for IndexedVec<T> {
 
     #[inline]
     fn index_range(&self) -> std::ops::Range<usize> {
-        self.start..(self.start+self.vec.len())
+        self.start..(self.start + self.vec.len())
     }
 
     #[inline]
@@ -53,15 +53,18 @@ impl<'a, T: 'a> IndexedSet<'a, T> for IndexedVec<T> {
 
     #[inline]
     fn get(&self, index: usize) -> Option<&T> {
-        self.vec.get(index-self.start)
+        self.vec.get(index - self.start)
     }
 
     #[inline]
     fn get_mut(&mut self, index: usize) -> Option<&mut T> {
-        self.vec.get_mut(index-self.start)
+        self.vec.get_mut(index - self.start)
     }
 
-    fn position_within(&self, range: std::ops::Range<usize>, elem: &T) -> Option<usize> where T: PartialEq {
+    fn position_within(&self, range: std::ops::Range<usize>, elem: &T) -> Option<usize>
+    where
+        T: PartialEq,
+    {
         for index in range {
             if self[index] == *elem {
                 return Some(index);
@@ -90,7 +93,7 @@ impl<'a, T: 'a> IndexedSet<'a, T> for IndexedVec<T> {
     }
 }
 
-#[derive(Debug,Clone)]
+#[derive(Debug, Clone)]
 pub struct Iter<'a, T> {
     ivec: &'a IndexedVec<T>,
     index: usize,
@@ -111,7 +114,7 @@ impl<'a, T> Iterator for Iter<'a, T> {
     }
 }
 
-#[derive(Debug,Clone)]
+#[derive(Debug, Clone)]
 pub struct Range<'a, T> {
     ivec: &'a IndexedVec<T>,
     index: usize,
@@ -151,13 +154,13 @@ impl<T> std::ops::Index<std::ops::Range<usize>> for IndexedVec<T> {
     type Output = [T];
 
     fn index(&self, index: std::ops::Range<usize>) -> &Self::Output {
-        &self.vec[index.start-self.start..index.end-self.start]
+        &self.vec[index.start - self.start..index.end - self.start]
     }
 }
 
 impl<T> std::ops::IndexMut<std::ops::Range<usize>> for IndexedVec<T> {
     fn index_mut(&mut self, index: std::ops::Range<usize>) -> &mut [T] {
-        &mut self.vec[index.start-self.start..index.end-self.start]
+        &mut self.vec[index.start - self.start..index.end - self.start]
     }
 }
 
@@ -165,13 +168,13 @@ impl<T> std::ops::Index<std::ops::RangeFrom<usize>> for IndexedVec<T> {
     type Output = [T];
 
     fn index(&self, index: std::ops::RangeFrom<usize>) -> &Self::Output {
-        &self.vec[index.start-self.start..]
+        &self.vec[index.start - self.start..]
     }
 }
 
 impl<T> std::ops::IndexMut<std::ops::RangeFrom<usize>> for IndexedVec<T> {
     fn index_mut(&mut self, index: std::ops::RangeFrom<usize>) -> &mut [T] {
-        &mut self.vec[index.start-self.start..]
+        &mut self.vec[index.start - self.start..]
     }
 }
 
@@ -179,13 +182,13 @@ impl<T> std::ops::Index<std::ops::RangeTo<usize>> for IndexedVec<T> {
     type Output = [T];
 
     fn index(&self, index: std::ops::RangeTo<usize>) -> &Self::Output {
-        &self.vec[..index.end-self.start]
+        &self.vec[..index.end - self.start]
     }
 }
 
 impl<T> std::ops::IndexMut<std::ops::RangeTo<usize>> for IndexedVec<T> {
     fn index_mut(&mut self, index: std::ops::RangeTo<usize>) -> &mut [T] {
-        &mut self.vec[..index.end-self.start]
+        &mut self.vec[..index.end - self.start]
     }
 }
 

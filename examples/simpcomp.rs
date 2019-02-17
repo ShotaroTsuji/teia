@@ -1,8 +1,8 @@
-use teia::reader::simpcomp;
-use teia::z2vector::Z2VecVector;
-use teia::z2reduce::{Z2ColumnReduce, Z2Pair};
 use std::fs::File;
 use std::io::BufReader;
+use teia::reader::simpcomp;
+use teia::z2reduce::{Z2ColumnReduce, Z2Pair};
+use teia::z2vector::Z2VecVector;
 
 fn main() {
     let file = File::open("examples/simpcomp1.txt").unwrap();

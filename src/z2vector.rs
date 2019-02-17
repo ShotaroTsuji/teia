@@ -1,5 +1,5 @@
-use std::iter::FromIterator;
 use crate::sign::Sign;
+use std::iter::FromIterator;
 
 /// The trait describes the operations on Z2Vector
 pub trait Z2Vector {
@@ -27,9 +27,7 @@ pub struct Z2VecVector {
 
 impl Z2VecVector {
     pub fn new() -> Self {
-        Z2VecVector {
-            vec: Vec::new(),
-        }
+        Z2VecVector { vec: Vec::new() }
     }
 
     pub fn is_valid(&self) -> bool {
@@ -90,16 +88,14 @@ impl Z2Vector for Z2VecVector {
 }
 
 impl FromIterator<(usize, Sign)> for Z2VecVector {
-    fn from_iter<I: IntoIterator<Item=(usize, Sign)>>(iter: I) -> Self {
+    fn from_iter<I: IntoIterator<Item = (usize, Sign)>>(iter: I) -> Self {
         let mut vec = Vec::new();
         for (pos, _sign) in iter {
             vec.push(pos);
         }
         vec.sort_by(|a, b| b.cmp(a));
 
-        Z2VecVector {
-            vec: vec,
-        }
+        Z2VecVector { vec: vec }
     }
 }
 
@@ -121,8 +117,7 @@ impl PartialEq for Z2VecVector {
 }
 impl Eq for Z2VecVector {}
 
-impl std::fmt::Display for Z2VecVector
-{
+impl std::fmt::Display for Z2VecVector {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "Z2VecVector[")?;
         for x in self.vec.iter() {
@@ -134,7 +129,7 @@ impl std::fmt::Display for Z2VecVector
 
 #[cfg(test)]
 mod tests {
-    use crate::z2vector::{Z2Vector, Z2VecVector};
+    use crate::z2vector::{Z2VecVector, Z2Vector};
 
     #[test]
     pub fn z2vecvec_eq() {

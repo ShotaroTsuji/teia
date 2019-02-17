@@ -1,4 +1,4 @@
-#[derive(Debug,Clone,Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct Sign(i8);
 
 impl Sign {
@@ -47,7 +47,7 @@ impl std::ops::Mul<Sign> for Sign {
 
     #[inline]
     fn mul(self, rhs: Sign) -> Self::Output {
-        Sign(self.0*rhs.0)
+        Sign(self.0 * rhs.0)
     }
 }
 

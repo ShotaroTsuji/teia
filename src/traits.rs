@@ -1,9 +1,12 @@
-use crate::simplex::Simplex;
 use crate::sign::Sign;
+use crate::simplex::Simplex;
 
-pub trait ChainGenerator<'a> where Self: Sized {
-    type VerticesIter: Iterator<Item=&'a usize>;
-    type BoundaryIter: Iterator<Item=Self>;
+pub trait ChainGenerator<'a>
+where
+    Self: Sized,
+{
+    type VerticesIter: Iterator<Item = &'a usize>;
+    type BoundaryIter: Iterator<Item = Self>;
 
     fn dimension(&self) -> usize;
     fn vertices(&'a self) -> Self::VerticesIter;
@@ -13,8 +16,8 @@ pub trait ChainGenerator<'a> where Self: Sized {
 }
 
 pub trait IndexedSet<'a, T: 'a> {
-    type Iter: Iterator<Item=(usize, &'a T)>;
-    type Range: Iterator<Item=(usize, &'a T)>;
+    type Iter: Iterator<Item = (usize, &'a T)>;
+    type Range: Iterator<Item = (usize, &'a T)>;
 
     fn new(index: usize) -> Self;
     fn from_vec(vec: Vec<T>, start: usize) -> Self;
@@ -25,7 +28,9 @@ pub trait IndexedSet<'a, T: 'a> {
     fn push(&mut self, elem: T);
     fn get(&self, index: usize) -> Option<&T>;
     fn get_mut(&mut self, index: usize) -> Option<&mut T>;
-    fn position_within(&self, range: std::ops::Range<usize>, elem: &T) -> Option<usize> where T: PartialEq;
+    fn position_within(&self, range: std::ops::Range<usize>, elem: &T) -> Option<usize>
+    where
+        T: PartialEq;
     fn iter(&'a self) -> Self::Iter;
     fn range(&'a self, range: std::ops::Range<usize>) -> Self::Range;
 }
