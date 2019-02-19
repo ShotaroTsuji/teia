@@ -1,8 +1,7 @@
 use crate::sign::Sign;
 use crate::simplex::Simplex;
 
-pub trait ChainGeneratorVertices<'a>
-{
+pub trait ChainGeneratorVertices<'a> {
     type VerticesIter: Iterator<Item = &'a usize>;
 
     fn vertices(&'a self) -> Self::VerticesIter;
@@ -17,8 +16,7 @@ where
     fn boundary(&'a self) -> Self::BoundaryIter;
 }
 
-pub trait ChainGenerator
-{
+pub trait ChainGenerator {
     fn dimension(&self) -> usize;
     fn inner_prod(&self, other: &Self) -> Sign;
     fn is_face_of(&self, other: &Self) -> bool;

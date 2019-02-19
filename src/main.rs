@@ -76,7 +76,7 @@ fn test_complex() {
 
     println!("BoundaryFacesPositions");
     {
-        let simp = simplex![0,1,2];
+        let simp = simplex![0, 1, 2];
         let range = comp.basis.range(3..6);
         let iter = BoundaryFacesPositions::new(range, &simp);
         for item in iter {
@@ -97,12 +97,12 @@ fn test_complex2() {
     comp0.push(simplex![2]);
 
     let mut comp1 = Complex::<IndexedVec<_>, Simplex>::with_prev(&comp0);
-    comp1.push(simplex![0,1]);
-    comp1.push(simplex![0,2]);
-    comp1.push(simplex![1,2]);
+    comp1.push(simplex![0, 1]);
+    comp1.push(simplex![0, 2]);
+    comp1.push(simplex![1, 2]);
 
     let mut comp2 = Complex::<IndexedVec<_>, Simplex>::with_prev(&comp1);
-    comp2.push(simplex![0,1,2]);
+    comp2.push(simplex![0, 1, 2]);
 
     println!("Complex 0 : {:?}", comp0);
     println!("Complex 1 : {:?}", comp1);

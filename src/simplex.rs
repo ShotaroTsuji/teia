@@ -66,7 +66,6 @@ impl<'a> ChainGeneratorBoundary<'a, Simplex> for Simplex {
     }
 }
 
-
 impl ChainGenerator for Simplex {
     /// Returns the dimension of simplex
     ///
@@ -112,7 +111,6 @@ impl ChainGenerator for Simplex {
             .iter()
             .all(|v| other.vertices.binary_search(v).is_ok())
     }
-
 }
 
 pub struct Vertices<'a> {

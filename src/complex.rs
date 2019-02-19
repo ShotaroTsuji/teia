@@ -46,7 +46,10 @@ where
         }
     }
 
-    pub fn boundaries_from<'b, FrIt, W>(&'a self, other: &'b Complex<'b, W, G>) -> BoundariesFrom<'a, 'b, V, W, G, FrIt> {
+    pub fn boundaries_from<'b, FrIt, W>(
+        &'a self,
+        other: &'b Complex<'b, W, G>,
+    ) -> BoundariesFrom<'a, 'b, V, W, G, FrIt> {
         BoundariesFrom {
             index: self.basis.index_start(),
             complex: self,
