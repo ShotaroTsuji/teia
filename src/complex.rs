@@ -37,20 +37,22 @@ where
         self.basis.push(elem);
     }
 
-    pub fn boundaries<FrIt>(&'a self) -> Boundaries<'a, V, G, FrIt> {
+    pub fn boundaries<FrIt>(&'a self) -> Boundaries<'a, 'a, V, V, G, FrIt> {
         Boundaries {
             index: self.basis.index_start(),
-            basis: &self.basis,
+            domain: &self.basis,
+            target: &self.basis,
             _phantom0: std::marker::PhantomData,
             _phantom1: std::marker::PhantomData,
+            _phantom2: std::marker::PhantomData,
         }
     }
 
     pub fn boundaries_from<'b, FrIt, W>(
         &'a self,
         other: &'b Complex<'b, W, G>,
-    ) -> BoundariesFrom<'a, 'b, V, W, G, FrIt> {
-        BoundariesFrom {
+    ) -> Boundaries<'a, 'b, V, W, G, FrIt> {
+        Boundaries {
             index: self.basis.index_start(),
             domain: &self.basis,
             target: &other.basis,
@@ -62,43 +64,7 @@ where
 }
 
 #[derive(Debug, Clone)]
-pub struct Boundaries<'a, V, ChGen, FrIt> {
-    index: usize,
-    basis: &'a V,
-    _phantom0: std::marker::PhantomData<&'a ChGen>,
-    _phantom1: std::marker::PhantomData<fn() -> FrIt>,
-}
-
-/// ChainGeneratorBoundary's lifetime <- ChGen's lifetime
-/// ChGen's lifetime <- 'a of IndexedSet<'a, ChGen> because ChGen: 'a must hold.
-impl<'a, V, ChGen, FrIt> Iterator for Boundaries<'a, V, ChGen, FrIt>
-where
-    V: IndexedSet<'a, ChGen>,
-    <V as IndexedSet<'a, ChGen>>::Range: Clone,
-    ChGen: ChainGenerator + ChainGeneratorBoundary<'a, ChGen> + PartialEq,
-    FrIt: std::iter::FromIterator<(usize, Sign)>,
-{
-    type Item = Result<(usize, FrIt), ComplexError>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.basis.index_end() {
-            let chain: Option<FrIt> = BoundaryFacesPositions::new(
-                self.basis.range(0..self.index),
-                self.basis.get(self.index).unwrap(),
-            )
-            .collect();
-            let index = self.index;
-            self.index += 1;
-            Some(chain.ok_or(ComplexError::ComplexIsNotFiltered)
-                .map(|value| (index, value)))
-        } else {
-            None
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct BoundariesFrom<'a, 'b, V, W, ChGen, FrIt> {
+pub struct Boundaries<'a, 'b, V, W, ChGen, FrIt> {
     index: usize,
     domain: &'a V,
     target: &'b W,
@@ -107,11 +73,11 @@ pub struct BoundariesFrom<'a, 'b, V, W, ChGen, FrIt> {
     _phantom2: std::marker::PhantomData<fn() -> FrIt>,
 }
 
-impl<'a, 'b, V, W, ChGen, FrIt> Iterator for BoundariesFrom<'a, 'b, V, W, ChGen, FrIt>
+impl<'a, 'b, V, W, ChGen, FrIt> Iterator for Boundaries<'a, 'b, V, W, ChGen, FrIt>
 where
     V: IndexedSet<'a, ChGen>,
     W: IndexedSet<'b, ChGen>,
-    <W as IndexedSet<'b, ChGen>>::Iter: Clone,
+    <W as IndexedSet<'b, ChGen>>::Range: Clone,
     ChGen: 'a + 'b + PartialEq + ChainGenerator + ChainGeneratorBoundary<'a, ChGen>,
     FrIt: std::iter::FromIterator<(usize, Sign)>,
 {
@@ -120,7 +86,7 @@ where
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.domain.index_end() {
             let chain: Option<FrIt> = BoundaryFacesPositions::new(
-                self.target.iter(),
+                self.target.range(0..self.index),
                 self.domain.get(self.index).unwrap(),
             )
             .collect();
