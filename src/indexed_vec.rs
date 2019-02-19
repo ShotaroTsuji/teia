@@ -87,7 +87,7 @@ impl<'a, T: 'a> IndexedSet<'a, T> for IndexedVec<T> {
         Range {
             ivec: &self,
             index: range.start,
-            end: range.end,
+            end: if range.end <= self.index_end() { range.end } else { self.index_end() },
             _phantom: std::marker::PhantomData,
         }
     }
