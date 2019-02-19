@@ -15,7 +15,7 @@ pub struct Z2ColumnReduce<V> {
 
 impl<V> Z2ColumnReduce<V>
 where
-    V: Z2Vector + std::fmt::Debug,
+    V: Z2Vector,
 {
     pub fn new(start: usize) -> Z2ColumnReduce<V> {
         Z2ColumnReduce {
@@ -31,9 +31,7 @@ where
     }
 
     pub fn reduce(&self, boundary: &mut V) {
-        println!("reduce the boundary {:?}", boundary);
         while let Some((_, chain)) = self.find_same_lowest(boundary) {
-            println!("... {:?}", chain);
             boundary.add_assign(chain);
         }
     }

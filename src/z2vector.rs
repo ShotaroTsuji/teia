@@ -19,6 +19,32 @@ pub struct Z2Chain<V> {
     boundary: V,
 }
 
+impl<V> Z2Chain<V>
+where
+    V: From<Vec<usize>>,
+{
+    pub fn new(index: usize, image: V) -> Self {
+        Z2Chain {
+            chain: V::from(vec![index]),
+            boundary: image,
+        }
+    }
+}
+
+impl<V> Z2Vector for Z2Chain<V>
+where
+    V: Z2Vector
+{
+    fn lowest(&self) -> Option<usize> {
+        self.boundary.lowest()
+    }
+
+    fn add_assign(&mut self, other: &Self) {
+        self.chain.add_assign(&other.chain);
+        self.boundary.add_assign(&other.boundary);
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Z2VectorVec {
     // the elements must be sorted in the descending order.

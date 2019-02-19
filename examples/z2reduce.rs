@@ -4,7 +4,7 @@ use teia::simplex;
 use teia::simplex::Simplex;
 use teia::complex;
 use teia::complex::{Complex, BoundaryFacesPositions};
-use teia::z2vector::Z2VectorVec;
+use teia::z2vector::*;
 use teia::z2reduce::{Z2ColumnReduce, Z2Pair};
 
 fn main() {
@@ -30,7 +30,7 @@ fn main() {
     let mut reduce = Z2ColumnReduce::new(comp.basis.index_start());
     comp.boundaries::<Z2VectorVec>()
         .map(|result| result.unwrap())
-        .map(|(_index, chain)| chain)
+        .map(|(index, image)| Z2Chain::new(index, image))
         .for_each(|chain| reduce.push(chain));
 
     println!("{:?}", reduce);
