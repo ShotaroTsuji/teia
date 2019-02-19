@@ -87,7 +87,6 @@ pub struct Z2Pair<'a, V, T> {
 
 impl<'a, V, T> Z2Pair<'a, V, T>
 where
-    V: Z2Vector,
     T: Iterator<Item=(usize, &'a V)>,
 {
     pub fn new(reduce: &'a Z2ColumnReduce<V>, cycles: T) -> Self {
@@ -101,7 +100,6 @@ where
 
 impl<'a, V, T> Iterator for Z2Pair<'a, V, T>
 where
-    V: Z2Vector + std::fmt::Debug,
     T: Iterator<Item=(usize, &'a V)>,
 {
     type Item = (Persistence<usize>, &'a V);
