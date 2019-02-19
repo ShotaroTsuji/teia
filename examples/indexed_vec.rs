@@ -15,7 +15,7 @@ fn main() {
     }
 
     println!("\n# range");
-    for v in vec.range(10..30) {
+    for v in vec.range(0..30) {
         println!("{:?}", v);
     }
 }
