@@ -54,7 +54,7 @@ impl<'a> ChainGeneratorVertices<'a> for Simplex {
     }
 }
 
-impl<'a> ChainGeneratorBoundary<'a> for Simplex {
+impl<'a> ChainGeneratorBoundary<'a, Simplex> for Simplex {
     type BoundaryIter = Boundary<'a>;
 
     fn boundary(&self) -> Boundary {

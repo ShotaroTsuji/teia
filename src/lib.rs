@@ -1,4 +1,4 @@
-//pub mod complex;
+pub mod complex;
 pub mod simplex;
 pub mod z2vector;
 //pub mod z2reduce;

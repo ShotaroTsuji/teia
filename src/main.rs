@@ -1,6 +1,6 @@
-//use teia::complex;
-//use teia::complex::BoundaryFacesPositions;
-//use teia::complex::Complex;
+use teia::complex;
+use teia::complex::BoundaryFacesPositions;
+use teia::complex::Complex;
 use teia::indexed_vec::IndexedVec;
 use teia::simplex;
 use teia::simplex::Simplex;
@@ -33,7 +33,6 @@ fn test_simplex() {
     println!("u.is_face_of(&s) = {}", u.is_face_of(&s));
 }
 
-/*
 fn test_complex() {
     println!("# test_complex");
     let mut comp: Complex<IndexedVec<_>, _> = Complex::new();
@@ -90,12 +89,40 @@ fn test_complex() {
         println!("{:?}", chain);
     }
 }
-*/
+
+fn test_complex2() {
+    let mut comp0 = Complex::<IndexedVec<_>, Simplex>::new();
+    comp0.push(simplex![0]);
+    comp0.push(simplex![1]);
+    comp0.push(simplex![2]);
+
+    let mut comp1 = Complex::<IndexedVec<_>, Simplex>::with_prev(&comp0);
+    comp1.push(simplex![0,1]);
+    comp1.push(simplex![0,2]);
+    comp1.push(simplex![1,2]);
+
+    let mut comp2 = Complex::<IndexedVec<_>, Simplex>::with_prev(&comp1);
+    comp2.push(simplex![0,1,2]);
+
+    println!("Complex 0 : {:?}", comp0);
+    println!("Complex 1 : {:?}", comp1);
+    println!("Complex 2 : {:?}", comp2);
+    println!("Complex 1's boundaries from complex 0");
+    for chain in comp1.boundaries_from::<Z2VecVector, _>(&comp0) {
+        println!("    {:?}", chain);
+    }
+    println!("Complex 2's boundaries from complex 1");
+    for chain in comp2.boundaries_from::<Z2VecVector, _>(&comp1) {
+        println!("    {:?}", chain);
+    }
+}
 
 fn main() {
     test_simplex();
     println!("");
 
-    //test_complex();
+    test_complex();
     println!("");
+
+    test_complex2();
 }
