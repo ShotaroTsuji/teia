@@ -78,7 +78,7 @@ where
     ChGen: ChainGenerator + ChainGeneratorBoundary<'a, ChGen> + PartialEq,
     FrIt: std::iter::FromIterator<(usize, Sign)>,
 {
-    type Item = Result<FrIt, ComplexError>;
+    type Item = Result<(usize, FrIt), ComplexError>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.complex.basis.index_end() {
@@ -87,8 +87,10 @@ where
                 self.complex.basis.get(self.index).unwrap(),
             )
             .collect();
+            let index = self.index;
             self.index += 1;
-            Some(chain.ok_or(ComplexError::ComplexIsNotFiltered))
+            Some(chain.ok_or(ComplexError::ComplexIsNotFiltered)
+                .map(|value| (index, value)))
         } else {
             None
         }
@@ -113,7 +115,7 @@ where
     ChGen: 'a + 'b + PartialEq + ChainGenerator + ChainGeneratorBoundary<'a, ChGen>,
     FrIt: std::iter::FromIterator<(usize, Sign)>,
 {
-    type Item = Result<FrIt, ComplexError>;
+    type Item = Result<(usize, FrIt), ComplexError>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.complex.basis.index_end() {
@@ -122,8 +124,10 @@ where
                 self.complex.basis.get(self.index).unwrap(),
             )
             .collect();
+            let index = self.index;
             self.index += 1;
-            Some(chain.ok_or(ComplexError::ComplexIsNotFiltered))
+            Some(chain.ok_or(ComplexError::ComplexIsNotFiltered)
+                 .map(|value| (index, value)))
         } else {
             None
         }
