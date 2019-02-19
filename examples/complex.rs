@@ -4,7 +4,7 @@ use teia::simplex;
 use teia::simplex::Simplex;
 use teia::complex;
 use teia::complex::{Complex, BoundaryFacesPositions};
-use teia::z2vector::Z2VecVector;
+use teia::z2vector::Z2VectorVec;
 
 fn main() {
     println!("# All-in-one complex example");
@@ -43,7 +43,7 @@ fn main() {
     println!("## `complex::compute_boundary`");
     for index in comp.basis.index_range() {
         print!("    index = {}, range = {:?}", index, 0..index);
-        let res: Option<Z2VecVector> =
+        let res: Option<Z2VectorVec> =
             complex::compute_boundary(comp.basis.range(0..index), &comp.basis[index]);
         println!("  -> {:?}", res);
     }
@@ -54,7 +54,7 @@ fn main() {
     for index in comp.basis.index_range() {
         print!("    index = {}, range = {:?}", index, 0..index);
         let iter = BoundaryFacesPositions::new(comp.basis.range(0..index), &comp.basis[index]);
-        let res: Option<Z2VecVector> = iter.collect();
+        let res: Option<Z2VectorVec> = iter.collect();
         println!("  -> {:?}", res);
     }
 
@@ -73,7 +73,7 @@ fn main() {
     println!("");
 
     println!("## Complex::boundaries()");
-    for chain in comp.boundaries::<Z2VecVector>() {
+    for chain in comp.boundaries::<Z2VectorVec>() {
         println!("{:?}", chain);
     }
 
@@ -131,19 +131,19 @@ fn main() {
 
     println!("");
     println!("## Complex 1's boundaries from complex 0");
-    for chain in comp1.boundaries_from::<Z2VecVector, _>(&comp0) {
+    for chain in comp1.boundaries_from::<Z2VectorVec, _>(&comp0) {
         println!("{:?}", chain);
     }
 
     println!("");
     println!("## Complex 2's boundaries from complex 1");
-    for chain in comp2.boundaries_from::<Z2VecVector, _>(&comp1) {
+    for chain in comp2.boundaries_from::<Z2VectorVec, _>(&comp1) {
         println!("{:?}", chain);
     }
 
     println!("");
     println!("## Complex 3's boundaries from complex 2");
-    for chain in comp3.boundaries_from::<Z2VecVector, _>(&comp2) {
+    for chain in comp3.boundaries_from::<Z2VectorVec, _>(&comp2) {
         println!("{:?}", chain);
     }
 }

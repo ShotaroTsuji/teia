@@ -40,7 +40,7 @@ where
     pub fn boundaries<FrIt>(&'a self) -> Boundaries<'a, V, G, FrIt> {
         Boundaries {
             index: self.basis.index_start(),
-            complex: self,
+            basis: &self.basis,
             _phantom0: std::marker::PhantomData,
             _phantom1: std::marker::PhantomData,
         }
@@ -52,8 +52,8 @@ where
     ) -> BoundariesFrom<'a, 'b, V, W, G, FrIt> {
         BoundariesFrom {
             index: self.basis.index_start(),
-            complex: self,
-            other: other,
+            domain: &self.basis,
+            target: &other.basis,
             _phantom0: std::marker::PhantomData,
             _phantom1: std::marker::PhantomData,
             _phantom2: std::marker::PhantomData,
@@ -64,7 +64,7 @@ where
 #[derive(Debug, Clone)]
 pub struct Boundaries<'a, V, ChGen, FrIt> {
     index: usize,
-    complex: &'a Complex<'a, V, ChGen>,
+    basis: &'a V,
     _phantom0: std::marker::PhantomData<&'a ChGen>,
     _phantom1: std::marker::PhantomData<fn() -> FrIt>,
 }
@@ -81,10 +81,10 @@ where
     type Item = Result<(usize, FrIt), ComplexError>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.complex.basis.index_end() {
+        if self.index < self.basis.index_end() {
             let chain: Option<FrIt> = BoundaryFacesPositions::new(
-                self.complex.basis.range(0..self.index),
-                self.complex.basis.get(self.index).unwrap(),
+                self.basis.range(0..self.index),
+                self.basis.get(self.index).unwrap(),
             )
             .collect();
             let index = self.index;
@@ -100,8 +100,8 @@ where
 #[derive(Debug, Clone)]
 pub struct BoundariesFrom<'a, 'b, V, W, ChGen, FrIt> {
     index: usize,
-    complex: &'a Complex<'a, V, ChGen>,
-    other: &'b Complex<'b, W, ChGen>,
+    domain: &'a V,
+    target: &'b W,
     _phantom0: std::marker::PhantomData<&'a ChGen>,
     _phantom1: std::marker::PhantomData<&'b ChGen>,
     _phantom2: std::marker::PhantomData<fn() -> FrIt>,
@@ -118,10 +118,10 @@ where
     type Item = Result<(usize, FrIt), ComplexError>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.index < self.complex.basis.index_end() {
+        if self.index < self.domain.index_end() {
             let chain: Option<FrIt> = BoundaryFacesPositions::new(
-                self.other.basis.iter(),
-                self.complex.basis.get(self.index).unwrap(),
+                self.target.iter(),
+                self.domain.get(self.index).unwrap(),
             )
             .collect();
             let index = self.index;
