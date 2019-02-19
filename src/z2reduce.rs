@@ -15,7 +15,7 @@ pub struct Z2ColumnReduce<V> {
 
 impl<V> Z2ColumnReduce<V>
 where
-    V: Z2Vector,
+    V: Z2Vector + std::fmt::Debug,
 {
     pub fn new(start: usize) -> Z2ColumnReduce<V> {
         Z2ColumnReduce {
@@ -42,7 +42,7 @@ where
         }
 
         if let Some(lowest) = boundary.lowest() {
-            let index = self.reduced.len();
+            let index = self.reduced.index_end();
             self.lowest_memo.insert(lowest, index);
         }
 

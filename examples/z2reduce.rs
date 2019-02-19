@@ -72,10 +72,6 @@ fn main() {
     comp2.push(simplex![0, 2, 3]);
     comp2.push(simplex![1, 2, 3]);
 
-
-    let mut comp3 = Complex::<IndexedVec<_>, Simplex>::with_prev(&comp2);
-    comp3.push(simplex![0, 1, 2, 3]);
-
     println!("");
     println!("## Complex 0");
     for simp in comp0.basis.iter() {
@@ -95,12 +91,6 @@ fn main() {
     }
 
     println!("");
-    println!("## Complex 3");
-    for simp in comp3.basis.iter() {
-        println!("{:?}", simp);
-    }
-
-    println!("");
     println!("## Complex 1's boundaries from complex 0");
     for chain in comp1.boundaries_from::<Z2VectorVec, _>(&comp0) {
         println!("{:?}", chain);
@@ -113,8 +103,48 @@ fn main() {
     }
 
     println!("");
-    println!("## Complex 3's boundaries from complex 2");
-    for chain in comp3.boundaries_from::<Z2VectorVec, _>(&comp2) {
-        println!("{:?}", chain);
+
+    let mut reduce0 = Z2ColumnReduce::new(comp0.basis.index_start());
+    comp0.boundaries::<Z2VectorVec>()
+        .map(|result| result.unwrap())
+        .map(|(index, image)| Z2Chain::new(index, image))
+        .for_each(|chain| reduce0.push(chain));
+
+    println!("{:?}", reduce0);
+
+    let mut reduce1 = Z2ColumnReduce::new(comp1.basis.index_start());
+    comp1.boundaries_from::<Z2VectorVec, _>(&comp0)
+        .map(|result| result.unwrap())
+        .map(|(index, image)| Z2Chain::new(index, image))
+        .for_each(|chain| reduce1.push(chain));
+
+    println!("{:?}", reduce1);
+
+    let mut reduce2 = Z2ColumnReduce::new(comp2.basis.index_start());
+    comp2.boundaries_from::<Z2VectorVec, _>(&comp1)
+        .map(|result| result.unwrap())
+        .map(|(index, image)| Z2Chain::new(index, image))
+        .for_each(|chain| reduce2.push(chain));
+
+    println!("{:?}", reduce2);
+
+    println!("");
+    println!("## pairing of dim0 and dim1");
+    let pair1 = Z2Pair::new(&reduce1, reduce0.cycles());
+    for pers in pair1 {
+        println!("    {:?}", pers);
+    }
+
+    println!("");
+    println!("## pairing of dim1 and dim2");
+    let pair2 = Z2Pair::new(&reduce2, reduce1.cycles());
+    for pers in pair2 {
+        println!("    {:?}", pers);
+    }
+
+    println!("");
+    println!("## cycles of dim2");
+    for cyc in reduce2.cycles() {
+        println!("    {:?}", cyc);
     }
 }
