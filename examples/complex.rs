@@ -1,84 +1,149 @@
-use teia::complex::ComplexBuilder;
+use teia::traits::*;
+use teia::indexed_vec::IndexedVec;
 use teia::simplex;
+use teia::simplex::Simplex;
+use teia::complex;
+use teia::complex::{Complex, BoundaryFacesPositions};
 use teia::z2vector::Z2VecVector;
 
 fn main() {
-    let mut builder = ComplexBuilder::new();
-    builder.push(simplex![+; 0]);
-    builder.push(simplex![+; 1]);
-    builder.push(simplex![+; 2]);
-    builder.push(simplex![+; 1, 2]);
-    builder.push(simplex![+; 0, 2]);
-    builder.push(simplex![+; 0, 1]);
-    builder.push(simplex![+; 0, 1, 2]);
+    println!("# All-in-one complex example");
+    let mut comp: Complex<IndexedVec<_>, _> = Complex::new();
 
-    let comp = builder.build().unwrap();
+    comp.push(simplex![0]);
+    comp.push(simplex![1]);
+    comp.push(simplex![2]);
+    comp.push(simplex![0, 1]);
+    comp.push(simplex![0, 2]);
+    comp.push(simplex![1, 2]);
+    comp.push(simplex![0, 1, 2]);
+    comp.push(simplex![0, 1, 2, 3]);
 
-    println!("Complex:");
-    println!("{}", comp);
     println!("");
 
-    println!("index_range method");
-    println!("index_range = {:?}", comp.index_range());
+    println!("## Debug print");
+    println!("{:?}", comp);
+
     println!("");
 
-    println!("get method");
-    println!("get(0) = {:?}", comp.get(0));
-    println!("get(10) = {:?}", comp.get(10));
-    println!("");
-
-    println!("range method");
-    println!("range(index_range()) = ");
-    for s in comp.range(comp.index_range()) {
-        println!("    {:?}", s);
+    println!("## Iterator");
+    for t in comp.basis.iter() {
+        println!("{:?}", t);
     }
-    println!("range(0..3) = ");
-    for s in comp.range(0..3) {
-        println!("    {:?}", s);
+
+    println!("");
+
+    println!("## Range(3..6)");
+    for t in comp.basis.range(3..6) {
+        println!("{:?}", t);
     }
+
     println!("");
 
-    println!("index method");
-    println!("comp[1] = {:?}", comp[1]);
-    println!("");
-
-    println!("boundary method");
-    println!("boundary(3) = {:?}", comp.boundary::<Z2VecVector>(3));
-    println!("boundary(5) = {:?}", comp.boundary::<Z2VecVector>(5));
-    println!("boundary(6) = {:?}", comp.boundary::<Z2VecVector>(6));
-    println!("");
-
-    println!("boundary_from method");
-    println!(
-        "boundary_from(range(0..3), 3) = {:?}",
-        comp.boundary_from::<Z2VecVector, _>(comp.range(0..3), 3)
-    );
-    println!("");
-
-    println!("boundaries method");
-    for v in comp.boundaries::<Z2VecVector>() {
-        println!("    {:?}", v);
+    println!("## `complex::compute_boundary`");
+    for index in comp.basis.index_range() {
+        print!("    index = {}, range = {:?}", index, 0..index);
+        let res: Option<Z2VecVector> =
+            complex::compute_boundary(comp.basis.range(0..index), &comp.basis[index]);
+        println!("  -> {:?}", res);
     }
+
     println!("");
 
-    println!("boundaries_from method");
-    println!("boundaries_from(iter())");
-    for v in comp.boundaries_from::<Z2VecVector, _>(comp.iter()) {
-        println!("    {:?}", v);
+    println!("## The iterator `BoundaryFacesPositions` ");
+    for index in comp.basis.index_range() {
+        print!("    index = {}, range = {:?}", index, 0..index);
+        let iter = BoundaryFacesPositions::new(comp.basis.range(0..index), &comp.basis[index]);
+        let res: Option<Z2VecVector> = iter.collect();
+        println!("  -> {:?}", res);
     }
+
     println!("");
 
-    println!("# Dimension-wise construction");
-    let mut builder = ComplexBuilder::new();
-    builder.push(simplex![+; 0]);
-    builder.push(simplex![+; 1]);
-    builder.push(simplex![+; 2]);
+    println!("## `BoundaryFacesPositions` for range(3..6) and simplex![0,1,2]");
+    {
+        let simp = simplex![0, 1, 2];
+        let range = comp.basis.range(3..6);
+        let iter = BoundaryFacesPositions::new(range, &simp);
+        for item in iter {
+            println!("    {:?}", item);
+        }
+    }
 
-    let comp0 = builder.build().unwrap();
+    println!("");
 
-    let mut builder = ComplexBuilder::new();
-    builder.base_index(comp0.index_range().end);
+    println!("## Complex::boundaries()");
+    for chain in comp.boundaries::<Z2VecVector>() {
+        println!("{:?}", chain);
+    }
 
-    println!("Complex of dimension 0");
-    println!("{}", comp0);
+    println!("");
+
+    println!("# Separated complex example");
+
+    let mut comp0 = Complex::<IndexedVec<_>, Simplex>::new();
+    comp0.push(simplex![0]);
+    comp0.push(simplex![1]);
+    comp0.push(simplex![2]);
+    comp0.push(simplex![3]);
+
+    let mut comp1 = Complex::<IndexedVec<_>, Simplex>::with_prev(&comp0);
+    comp1.push(simplex![0, 1]);
+    comp1.push(simplex![0, 2]);
+    comp1.push(simplex![0, 3]);
+    comp1.push(simplex![1, 2]);
+    comp1.push(simplex![1, 3]);
+    comp1.push(simplex![2, 3]);
+
+    let mut comp2 = Complex::<IndexedVec<_>, Simplex>::with_prev(&comp1);
+    comp2.push(simplex![0, 1, 2]);
+    comp2.push(simplex![0, 1, 3]);
+    comp2.push(simplex![0, 2, 3]);
+    comp2.push(simplex![1, 2, 3]);
+
+
+    let mut comp3 = Complex::<IndexedVec<_>, Simplex>::with_prev(&comp2);
+    comp3.push(simplex![0, 1, 2, 3]);
+
+    println!("");
+    println!("## Complex 0");
+    for simp in comp0.basis.iter() {
+        println!("{:?}", simp);
+    }
+
+    println!("");
+    println!("## Complex 1");
+    for simp in comp1.basis.iter() {
+        println!("{:?}", simp);
+    }
+
+    println!("");
+    println!("## Complex 2");
+    for simp in comp2.basis.iter() {
+        println!("{:?}", simp);
+    }
+
+    println!("");
+    println!("## Complex 3");
+    for simp in comp3.basis.iter() {
+        println!("{:?}", simp);
+    }
+
+    println!("");
+    println!("## Complex 1's boundaries from complex 0");
+    for chain in comp1.boundaries_from::<Z2VecVector, _>(&comp0) {
+        println!("{:?}", chain);
+    }
+
+    println!("");
+    println!("## Complex 2's boundaries from complex 1");
+    for chain in comp2.boundaries_from::<Z2VecVector, _>(&comp1) {
+        println!("{:?}", chain);
+    }
+
+    println!("");
+    println!("## Complex 3's boundaries from complex 2");
+    for chain in comp3.boundaries_from::<Z2VecVector, _>(&comp2) {
+        println!("{:?}", chain);
+    }
 }
