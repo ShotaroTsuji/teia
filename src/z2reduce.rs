@@ -3,10 +3,12 @@ use std::marker::PhantomData;
 use std::iter::FromIterator;
 use crate::Persistence;
 use crate::z2vector::Z2Vector;
+use crate::traits::IndexedSet;
+use crate::indexed_vec::IndexedVec;
 
 #[derive(Debug)]
 pub struct Z2ColumnReduce<V> {
-    reduced: Vec<V>,
+    reduced: IndexedVec<V>,
     // mapping of lowest index to position in `reduced`
     lowest_memo: BTreeMap<usize, usize>,
 }
@@ -15,9 +17,9 @@ impl<V> Z2ColumnReduce<V>
 where
     V: Z2Vector + std::fmt::Debug,
 {
-    pub fn new() -> Z2ColumnReduce<V> {
+    pub fn new(start: usize) -> Z2ColumnReduce<V> {
         Z2ColumnReduce {
-            reduced: Vec::new(),
+            reduced: IndexedVec::new(start),
             lowest_memo: BTreeMap::new(),
         }
     }
@@ -51,21 +53,7 @@ where
 
     pub fn cycles<'a>(&'a self) -> impl Iterator<Item=(usize, &V)> {
         self.reduced.iter()
-            .enumerate()
             .filter(|(_, c): &(usize, &V)| c.is_cycle())
-    }
-}
-
-impl<V> FromIterator<V> for Z2ColumnReduce<V>
-where
-    V: Z2Vector + std::fmt::Debug,
-{
-    fn from_iter<I: IntoIterator<Item=V>>(iter: I) -> Self {
-        let mut reduce = Z2ColumnReduce::new();
-        for vec in iter {
-            reduce.push(vec);
-        }
-        reduce
     }
 }
 
