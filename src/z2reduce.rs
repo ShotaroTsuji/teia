@@ -51,9 +51,33 @@ where
         self.reduced.push(boundary);
     }
 
-    pub fn cycles<'a>(&'a self) -> impl Iterator<Item=(usize, &V)> {
-        self.reduced.iter()
-            .filter(|(_, c): &(usize, &V)| c.is_cycle())
+    pub fn cycles<'a>(&'a self) -> Cycles<'a, <IndexedVec<V> as IndexedSet<V>>::Iter, V> {
+        Cycles {
+            iter: self.reduced.iter(),
+            _phantom: (PhantomData, PhantomData),
+        }
+    }
+}
+
+pub struct Cycles<'a, I, V> {
+    iter: I,
+    _phantom: (PhantomData<fn () -> V>, PhantomData<&'a V>),
+}
+
+impl<'a, I, V> Iterator for Cycles<'a, I, V>
+where
+    I: Iterator<Item=(usize, &'a V)>,
+    V: Z2Vector,
+{
+    type Item = (usize, &'a V);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        while let Some((index, chain)) = self.iter.next() {
+            if chain.is_cycle() {
+                return Some((index, chain));
+            }
+        }
+        None
     }
 }
 

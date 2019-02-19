@@ -5,7 +5,7 @@ use teia::simplex::Simplex;
 use teia::complex;
 use teia::complex::{Complex, BoundaryFacesPositions};
 use teia::z2vector::Z2VectorVec;
-use teia::z2reduce::Z2ColumnReduce;
+use teia::z2reduce::{Z2ColumnReduce, Z2Pair};
 
 fn main() {
     println!("# All-in-one complex example");
@@ -34,6 +34,20 @@ fn main() {
         .for_each(|chain| reduce.push(chain));
 
     println!("{:?}", reduce);
+    println!("");
+
+    println!("## cycles");
+    for c in reduce.cycles() {
+        println!("{:?}", c);
+    }
+    println!("");
+
+    println!("## Z2Pair");
+    let pair = Z2Pair::new(&reduce, reduce.cycles());
+    for pers in pair {
+        println!("{:?}", pers);
+    }
+
     println!("");
 
     println!("# Separated complex example");
