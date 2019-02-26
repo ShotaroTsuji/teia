@@ -145,14 +145,16 @@ fn main() {
 
     println!("");
     println!("## pairing of dim0 and dim1");
-    let pair1 = Z2Pair::new(&reduce1, reduce0.cycles());
+    let cycles0 = reduce0.into_cycle_positions();
+    let pair1 = Z2Pair::new(&reduce1, cycles0.iter());
     for pers in pair1 {
         println!("    {:?}", pers);
     }
 
     println!("");
     println!("## pairing of dim1 and dim2");
-    let pair2 = Z2Pair::new(&reduce2, reduce1.cycles());
+    let cycles1 = reduce1.into_cycle_positions();
+    let pair2 = Z2Pair::new(&reduce2, cycles1.iter());
     for pers in pair2 {
         println!("    {:?}", pers);
     }

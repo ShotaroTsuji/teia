@@ -110,6 +110,20 @@ where
             _phantom: (PhantomData, PhantomData),
         }
     }
+
+    pub fn into_cycle_positions(self) -> CyclePositions {
+        let mut positions = Vec::new();
+
+        for (index, chain) in self.reduced.iter() {
+            if chain.is_cycle() {
+                positions.push(index);
+            }
+        }
+
+        CyclePositions {
+            positions: positions,
+        }
+    }
 }
 
 impl<V> LookupByLowest for Z2ColumnReduce<V> {
@@ -117,7 +131,6 @@ impl<V> LookupByLowest for Z2ColumnReduce<V> {
         self.lowest_memo.get(&lowest).map(|pos| *pos)
     }
 }
-
 
 pub struct CyclesIter<'a, I, V> {
     iter: I,
@@ -141,22 +154,35 @@ where
     }
 }
 
+pub struct CyclePositions {
+    positions: Vec<usize>,
+}
+
+impl CyclePositions {
+    pub fn iter<'a>(&'a self) -> impl Iterator<Item=(usize, ())> + 'a {
+        self.positions
+            .iter()
+            .map(|pos| (*pos, ()))
+    }
+}
+
+
 pub struct Z2Pair<'a, B, Z, C> {
     reduce: &'a B,
     cycles: Z,
-    _phantom: PhantomData<&'a C>,
+    _phantom: (PhantomData<&'a B>, PhantomData<fn () -> C>),
 }
 
 impl<'a, B, Z, C> Z2Pair<'a, B, Z, C>
 where
     B: LookupByLowest,
-    Z: Iterator<Item=(usize, &'a C)>,
+    Z: Iterator<Item=(usize, C)>,
 {
     pub fn new(reduce: &'a B, cycles: Z) -> Self {
         Z2Pair {
             reduce: reduce,
             cycles: cycles,
-            _phantom: PhantomData,
+            _phantom: (PhantomData, PhantomData),
         }
     }
 }
@@ -164,9 +190,9 @@ where
 impl<'a, B, Z, C> Iterator for Z2Pair<'a, B, Z, C>
 where
     B: LookupByLowest,
-    Z: Iterator<Item=(usize, &'a C)>,
+    Z: Iterator<Item=(usize, C)>,
 {
-    type Item = (Persistence<usize>, &'a C);
+    type Item = (Persistence<usize>, C);
 
     fn next(&mut self) -> Option<Self::Item> {
         self.cycles.next()
