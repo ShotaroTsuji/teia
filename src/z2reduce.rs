@@ -2,9 +2,11 @@ use std::collections::BTreeMap;
 use std::marker::PhantomData;
 use std::iter::FromIterator;
 use crate::Persistence;
+use crate::sign::Sign;
 use crate::z2vector::Z2Vector;
-use crate::traits::IndexedSet;
+use crate::traits::*;
 use crate::indexed_vec::IndexedVec;
+use crate::complex::Complex;
 
 #[derive(Debug)]
 pub struct Z2ColumnReduce<V> {
@@ -22,6 +24,59 @@ where
             reduced: IndexedVec::new(start),
             lowest_memo: BTreeMap::new(),
         }
+    }
+
+    pub fn from_complex<'a, IdVec, Gen>(complex: &'a Complex<'a, IdVec, Gen>) -> Result<Z2ColumnReduce<V>, failure::Error>
+    where
+        V: FromIterator<(usize, Sign)>,
+        Gen: 'a + PartialEq + ChainGenerator + ChainGeneratorBoundary<'a, Gen>,
+        IdVec: IndexedSet<'a, Gen>,
+        <IdVec as IndexedSet<'a, Gen>>::Range: Clone,
+    {
+        let mut reduce = Self::new(complex.basis.index_start());
+
+        for result in complex.boundaries::<V>() {
+            let (index, image) = result?;
+            reduce.push(image);
+        }
+
+        Ok(reduce)
+    }
+
+    pub fn from_complex_with<'a, IdVec, Gen, F, U>(complex: &'a Complex<'a, IdVec, Gen>, mut f: F) -> Result<Z2ColumnReduce<V>, failure::Error>
+    where
+        Gen: 'a + PartialEq + ChainGenerator + ChainGeneratorBoundary<'a, Gen>,
+        IdVec: IndexedSet<'a, Gen>,
+        <IdVec as IndexedSet<'a, Gen>>::Range: Clone,
+        F: FnMut(usize, U) -> V,
+        U: Z2Vector + FromIterator<(usize, Sign)>,
+    {
+        let mut reduce = Self::new(complex.basis.index_start());
+
+        for result in complex.boundaries::<U>() {
+            let (index, image) = result?;
+            reduce.push(f(index, image));
+        }
+
+        Ok(reduce)
+    }
+
+    pub fn from_complexes<'a, 'b, IdSetA, IdSetB, ChGen>(domain: &'a Complex<'a, IdSetA, ChGen>, target: &'b Complex<'b, IdSetB, ChGen>) -> Result<Z2ColumnReduce<V>, failure::Error>
+    where
+        V: FromIterator<(usize, Sign)>,
+        ChGen: 'a + 'b + PartialEq + ChainGenerator + ChainGeneratorBoundary<'a, ChGen>,
+        IdSetA: IndexedSet<'a, ChGen>,
+        IdSetB: IndexedSet<'b, ChGen>,
+        <IdSetB as IndexedSet<'b, ChGen>>::Range: Clone,
+    {
+        let mut reduce = Self::new(domain.basis.index_start());
+
+        for result in domain.boundaries_from::<V, _>(target) {
+            let (index, image) = result?;
+            reduce.push(image);
+        }
+
+        Ok(reduce)
     }
 
     pub fn find_same_lowest(&self, boundary: &V) -> Option<(usize, &V)> {

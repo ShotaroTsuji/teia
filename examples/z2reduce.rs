@@ -27,11 +27,18 @@ fn main() {
 
     println!("");
 
+    //let reduce = Z2ColumnReduce::<Z2VectorVec>::from_complex(&comp).unwrap();
+    let reduce = Z2ColumnReduce::<Z2Chain<Z2VectorVec>>
+        ::from_complex_with(&comp, |index, image| Z2Chain::new(index, image))
+        .unwrap();
+
+    /*
     let mut reduce = Z2ColumnReduce::new(comp.basis.index_start());
     comp.boundaries::<Z2VectorVec>()
         .map(|result| result.unwrap())
         .map(|(index, image)| Z2Chain::new(index, image))
         .for_each(|chain| reduce.push(chain));
+    */
 
     println!("{:?}", reduce);
     println!("");
@@ -104,27 +111,36 @@ fn main() {
 
     println!("");
 
+    /*
     let mut reduce0 = Z2ColumnReduce::new(comp0.basis.index_start());
     comp0.boundaries::<Z2VectorVec>()
         .map(|result| result.unwrap())
         .map(|(index, image)| Z2Chain::new(index, image))
         .for_each(|chain| reduce0.push(chain));
+    */
+    let reduce0 = Z2ColumnReduce::<Z2VectorVec>::from_complex(&comp0).unwrap();
 
     println!("{:?}", reduce0);
 
+    /*
     let mut reduce1 = Z2ColumnReduce::new(comp1.basis.index_start());
     comp1.boundaries_from::<Z2VectorVec, _>(&comp0)
         .map(|result| result.unwrap())
         .map(|(index, image)| Z2Chain::new(index, image))
         .for_each(|chain| reduce1.push(chain));
+    */
+    let reduce1 = Z2ColumnReduce::<Z2VectorVec>::from_complexes(&comp1, &comp0).unwrap();
 
     println!("{:?}", reduce1);
 
+    /*
     let mut reduce2 = Z2ColumnReduce::new(comp2.basis.index_start());
     comp2.boundaries_from::<Z2VectorVec, _>(&comp1)
         .map(|result| result.unwrap())
         .map(|(index, image)| Z2Chain::new(index, image))
         .for_each(|chain| reduce2.push(chain));
+    */
+    let reduce2 = Z2ColumnReduce::<Z2VectorVec>::from_complexes(&comp2, &comp1).unwrap();
 
     println!("{:?}", reduce2);
 
