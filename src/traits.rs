@@ -40,3 +40,7 @@ pub trait IndexedSet<'a, T: 'a> {
     fn iter(&'a self) -> Self::Iter;
     fn range(&'a self, range: std::ops::Range<usize>) -> Self::Range;
 }
+
+pub trait LookupByLowest {
+    fn lookup_by_lowest(&self, lowest: usize) -> Option<usize>;
+}

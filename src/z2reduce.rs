@@ -112,6 +112,13 @@ where
     }
 }
 
+impl<V> LookupByLowest for Z2ColumnReduce<V> {
+    fn lookup_by_lowest(&self, lowest: usize) -> Option<usize> {
+        self.lowest_memo.get(&lowest).map(|pos| *pos)
+    }
+}
+
+
 pub struct CyclesIter<'a, I, V> {
     iter: I,
     _phantom: (PhantomData<fn () -> V>, PhantomData<&'a V>),
@@ -134,17 +141,18 @@ where
     }
 }
 
-pub struct Z2Pair<'a, V, T> {
-    reduce: &'a Z2ColumnReduce<V>,
-    cycles: T,
-    _phantom: PhantomData<&'a Z2ColumnReduce<V>>,
+pub struct Z2Pair<'a, B, Z, C> {
+    reduce: &'a B,
+    cycles: Z,
+    _phantom: PhantomData<&'a C>,
 }
 
-impl<'a, V, T> Z2Pair<'a, V, T>
+impl<'a, B, Z, C> Z2Pair<'a, B, Z, C>
 where
-    T: Iterator<Item=(usize, &'a V)>,
+    B: LookupByLowest,
+    Z: Iterator<Item=(usize, &'a C)>,
 {
-    pub fn new(reduce: &'a Z2ColumnReduce<V>, cycles: T) -> Self {
+    pub fn new(reduce: &'a B, cycles: Z) -> Self {
         Z2Pair {
             reduce: reduce,
             cycles: cycles,
@@ -153,16 +161,17 @@ where
     }
 }
 
-impl<'a, V, T> Iterator for Z2Pair<'a, V, T>
+impl<'a, B, Z, C> Iterator for Z2Pair<'a, B, Z, C>
 where
-    T: Iterator<Item=(usize, &'a V)>,
+    B: LookupByLowest,
+    Z: Iterator<Item=(usize, &'a C)>,
 {
-    type Item = (Persistence<usize>, &'a V);
+    type Item = (Persistence<usize>, &'a C);
 
     fn next(&mut self) -> Option<Self::Item> {
         self.cycles.next()
             .map(|(index, cycle)| {
-                let boundary_pos = self.reduce.lowest_memo.get(&index).map(|pos| *pos);
+                let boundary_pos = self.reduce.lookup_by_lowest(index);
                 (Persistence(index, boundary_pos), cycle)
             })
     }
