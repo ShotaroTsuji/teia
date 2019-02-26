@@ -104,20 +104,20 @@ where
         self.reduced.push(boundary);
     }
 
-    pub fn cycles<'a>(&'a self) -> Cycles<'a, <IndexedVec<V> as IndexedSet<V>>::Iter, V> {
-        Cycles {
+    pub fn cycles<'a>(&'a self) -> CyclesIter<'a, <IndexedVec<V> as IndexedSet<V>>::Iter, V> {
+        CyclesIter {
             iter: self.reduced.iter(),
             _phantom: (PhantomData, PhantomData),
         }
     }
 }
 
-pub struct Cycles<'a, I, V> {
+pub struct CyclesIter<'a, I, V> {
     iter: I,
     _phantom: (PhantomData<fn () -> V>, PhantomData<&'a V>),
 }
 
-impl<'a, I, V> Iterator for Cycles<'a, I, V>
+impl<'a, I, V> Iterator for CyclesIter<'a, I, V>
 where
     I: Iterator<Item=(usize, &'a V)>,
     V: Z2Vector,
