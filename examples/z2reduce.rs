@@ -2,8 +2,7 @@ use teia::traits::*;
 use teia::indexed_vec::IndexedVec;
 use teia::simplex;
 use teia::simplex::Simplex;
-use teia::complex;
-use teia::complex::{Complex, BoundaryFacesPositions};
+use teia::complex::Complex;
 use teia::z2vector::*;
 use teia::z2reduce::{Z2ColumnReduce, Z2Pair};
 

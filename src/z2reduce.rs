@@ -36,7 +36,7 @@ where
         let mut reduce = Self::new(complex.basis.index_start());
 
         for result in complex.boundaries::<V>() {
-            let (index, image) = result?;
+            let (_, image) = result?;
             reduce.push(image);
         }
 
@@ -72,7 +72,7 @@ where
         let mut reduce = Self::new(domain.basis.index_start());
 
         for result in domain.boundaries_from::<V, _>(target) {
-            let (index, image) = result?;
+            let (_, image) = result?;
             reduce.push(image);
         }
 

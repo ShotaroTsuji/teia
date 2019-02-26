@@ -1,5 +1,4 @@
 use crate::sign::Sign;
-use crate::simplex::Simplex;
 
 pub trait ChainGeneratorVertices<'a> {
     type VerticesIter: Iterator<Item = &'a usize>;
