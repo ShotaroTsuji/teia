@@ -105,11 +105,21 @@ impl<'a, T: 'a> IndexedSetIters<'a, T> for IndexedVec<T> {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Iter<'a, T> {
     ivec: &'a IndexedVec<T>,
     index: usize,
     _phantom: std::marker::PhantomData<&'a IndexedVec<T>>,
+}
+
+impl<'a, T: 'a> Clone for Iter<'a, T> {
+    fn clone(&self) -> Self {
+        Iter {
+            ivec: self.ivec,
+            index: self.index,
+            _phantom: std::marker::PhantomData,
+        }
+    }
 }
 
 impl<'a, T: 'a> Iterator for Iter<'a, T> {
@@ -147,12 +157,23 @@ impl<T> Iterator for IntoIter<T> {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Range<'a, T> {
     ivec: &'a IndexedVec<T>,
     index: usize,
     end: usize,
     _phantom: std::marker::PhantomData<&'a IndexedVec<T>>,
+}
+
+impl<'a, T: 'a> Clone for Range<'a, T> {
+    fn clone(&self) -> Self {
+        Range {
+            ivec: self.ivec,
+            index: self.index,
+            end: self.end,
+            _phantom: std::marker::PhantomData,
+        }
+    }
 }
 
 impl<'a, T: 'a> Iterator for Range<'a, T> {
