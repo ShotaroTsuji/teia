@@ -25,11 +25,11 @@ where
         }
     }
 
-    pub fn from_complex<'a, IdVec, Gen>(complex: &'a Complex<IdVec, Gen>) -> Result<Z2ColumnReduce<V>, failure::Error>
+    pub fn from_complex<IdVec, Gen>(complex: &Complex<IdVec, Gen>) -> Result<Z2ColumnReduce<V>, failure::Error>
     where
         V: FromIterator<(usize, Sign)>,
-        Gen: 'a + PartialEq + ChainGenerator + ChainGeneratorBoundary<'a, Gen>,
-        IdVec: IndexedSet<Gen> + IndexedSetIters<'a, Gen>,
+        Gen: PartialEq + ChainGenerator + for<'a> ChainGeneratorBoundary<'a, Gen>,
+        IdVec: IndexedSet<Gen> + for<'a> IndexedSetIters<'a, Gen>,
     {
         let mut reduce = Self::new(complex.basis.index_start());
 
@@ -41,10 +41,10 @@ where
         Ok(reduce)
     }
 
-    pub fn from_complex_with<'a, IdSet, ChGen, F, U>(complex: &'a Complex<IdSet, ChGen>, mut f: F) -> Result<Z2ColumnReduce<V>, failure::Error>
+    pub fn from_complex_with<IdSet, ChGen, F, U>(complex: &Complex<IdSet, ChGen>, mut f: F) -> Result<Z2ColumnReduce<V>, failure::Error>
     where
-        ChGen: 'a + PartialEq + ChainGenerator + ChainGeneratorBoundary<'a, ChGen>,
-        IdSet: IndexedSet<ChGen> + IndexedSetIters<'a, ChGen>,
+        ChGen: PartialEq + ChainGenerator + for<'a> ChainGeneratorBoundary<'a, ChGen>,
+        IdSet: IndexedSet<ChGen> + for<'a> IndexedSetIters<'a, ChGen>,
         F: FnMut(usize, U) -> V,
         U: Z2Vector + FromIterator<(usize, Sign)>,
     {
@@ -58,12 +58,12 @@ where
         Ok(reduce)
     }
 
-    pub fn from_complexes<'a, 'b, IdSetA, IdSetB, ChGen>(domain: &'a Complex<IdSetA, ChGen>, target: &'b Complex<IdSetB, ChGen>) -> Result<Z2ColumnReduce<V>, failure::Error>
+    pub fn from_complexes<IdSetA, IdSetB, ChGen>(domain: &Complex<IdSetA, ChGen>, target: &Complex<IdSetB, ChGen>) -> Result<Z2ColumnReduce<V>, failure::Error>
     where
         V: FromIterator<(usize, Sign)>,
-        ChGen: 'a + 'b + PartialEq + ChainGenerator + ChainGeneratorBoundary<'a, ChGen>,
+        ChGen: PartialEq + ChainGenerator + for<'a> ChainGeneratorBoundary<'a, ChGen>,
         IdSetA: IndexedSet<ChGen>,
-        IdSetB: IndexedSetIters<'b, ChGen>,
+        IdSetB: for<'b> IndexedSetIters<'b, ChGen>,
     {
         let mut reduce = Self::new(domain.basis.index_start());
 
