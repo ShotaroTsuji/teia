@@ -37,9 +37,9 @@ pub trait IndexedSet<T> {
 }
 
 pub trait IndexedSetIters<'a, T: 'a> {
-    type Iter: Iterator<Item = (usize, &'a T)>;
+    type Iter: Iterator<Item = (usize, &'a T)> + Clone;
     type IntoIter: Iterator<Item = (usize, T)>;
-    type Range: Iterator<Item = (usize, &'a T)>;
+    type Range: Iterator<Item = (usize, &'a T)> + Clone;
 
     fn iter(&'a self) -> Self::Iter;
     fn into_iter(self) -> Self::IntoIter;
