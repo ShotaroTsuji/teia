@@ -52,6 +52,10 @@ where
         }
     }
 
+    pub fn push_unchecked(&mut self, elem: G) {
+        self.basis.push(elem);
+    }
+
     pub fn boundaries<'a, FrIt>(&'a self) -> Boundaries<'a, 'a, V, V, G, FrIt> {
         Boundaries {
             index: self.basis.index_start(),
