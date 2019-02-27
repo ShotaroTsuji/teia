@@ -98,8 +98,16 @@ impl<'a, T: 'a> IndexedSetIters<'a, T> for IndexedVec<T> {
     fn range(&'a self, range: std::ops::Range<usize>) -> Range<'a, T> {
         Range {
             ivec: &self,
-            index: if range.start < self.index_start() { self.index_start() } else { range.start },
-            end: if range.end <= self.index_end() { range.end } else { self.index_end() },
+            index: if range.start < self.index_start() {
+                self.index_start()
+            } else {
+                range.start
+            },
+            end: if range.end <= self.index_end() {
+                range.end
+            } else {
+                self.index_end()
+            },
             _phantom: std::marker::PhantomData,
         }
     }

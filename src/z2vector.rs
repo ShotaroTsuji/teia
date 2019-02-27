@@ -33,7 +33,7 @@ where
 
 impl<V> Z2Vector for Z2Chain<V>
 where
-    V: Z2Vector
+    V: Z2Vector,
 {
     fn lowest(&self) -> Option<usize> {
         self.boundary.lowest()
@@ -155,7 +155,7 @@ impl std::fmt::Display for Z2VectorVec {
 
 #[cfg(test)]
 mod tests {
-    use crate::z2vector::{Z2VectorVec, Z2Vector};
+    use crate::z2vector::{Z2Vector, Z2VectorVec};
 
     #[test]
     pub fn z2vecvec_eq() {

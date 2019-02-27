@@ -1,12 +1,12 @@
 pub mod complex;
 pub mod simplex;
-pub mod z2vector;
 pub mod z2reduce;
+pub mod z2vector;
 
 pub mod indexed_vec;
+pub mod pair;
 pub mod sign;
 pub mod traits;
-pub mod pair;
 
 //pub mod reader;
 

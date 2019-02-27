@@ -5,7 +5,7 @@ use teia::indexed_vec::IndexedVec;
 use teia::simplex;
 use teia::simplex::Simplex;
 use teia::traits::*;
-use teia::z2vector::{Z2VectorVec, Z2Vector};
+use teia::z2vector::{Z2Vector, Z2VectorVec};
 
 fn test_simplex() {
     println!("# test_simplex");

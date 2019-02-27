@@ -13,7 +13,7 @@ pub enum ComplexError {
 #[derive(Debug, Clone)]
 pub struct Complex<V, G> {
     pub basis: V,
-    _phantom: std::marker::PhantomData<fn () -> G>,
+    _phantom: std::marker::PhantomData<fn() -> G>,
 }
 
 impl<V, G> Complex<V, G>
@@ -40,7 +40,8 @@ where
         V: for<'a> IndexedSetIters<'a, G>,
     {
         let result = {
-            self.basis.iter()
+            self.basis
+                .iter()
                 .find(|(_, gen)| !gen.inner_prod(&elem).is_zero())
         };
         match result {
@@ -48,7 +49,7 @@ where
             None => {
                 self.basis.push(elem);
                 Ok(())
-            },
+            }
         }
     }
 
@@ -110,8 +111,11 @@ where
             .collect();
             let index = self.index;
             self.index += 1;
-            Some(chain.ok_or(ComplexError::ComplexIsNotFiltered)
-                 .map(|value| (index, value)))
+            Some(
+                chain
+                    .ok_or(ComplexError::ComplexIsNotFiltered)
+                    .map(|value| (index, value)),
+            )
         } else {
             None
         }

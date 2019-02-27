@@ -1,11 +1,11 @@
-use std::collections::BTreeMap;
-use std::marker::PhantomData;
-use std::iter::FromIterator;
-use crate::sign::Sign;
-use crate::z2vector::Z2Vector;
-use crate::traits::*;
-use crate::indexed_vec::IndexedVec;
 use crate::complex::Complex;
+use crate::indexed_vec::IndexedVec;
+use crate::sign::Sign;
+use crate::traits::*;
+use crate::z2vector::Z2Vector;
+use std::collections::BTreeMap;
+use std::iter::FromIterator;
+use std::marker::PhantomData;
 
 #[derive(Debug)]
 pub struct Z2ColumnReduce<V> {
@@ -25,7 +25,9 @@ where
         }
     }
 
-    pub fn from_complex<IdVec, Gen>(complex: &Complex<IdVec, Gen>) -> Result<Z2ColumnReduce<V>, failure::Error>
+    pub fn from_complex<IdVec, Gen>(
+        complex: &Complex<IdVec, Gen>,
+    ) -> Result<Z2ColumnReduce<V>, failure::Error>
     where
         V: FromIterator<(usize, Sign)>,
         Gen: PartialEq + ChainGenerator + for<'a> ChainGeneratorBoundary<'a, Gen>,
@@ -41,7 +43,10 @@ where
         Ok(reduce)
     }
 
-    pub fn from_complex_with<IdSet, ChGen, F, U>(complex: &Complex<IdSet, ChGen>, mut f: F) -> Result<Z2ColumnReduce<V>, failure::Error>
+    pub fn from_complex_with<IdSet, ChGen, F, U>(
+        complex: &Complex<IdSet, ChGen>,
+        mut f: F,
+    ) -> Result<Z2ColumnReduce<V>, failure::Error>
     where
         ChGen: PartialEq + ChainGenerator + for<'a> ChainGeneratorBoundary<'a, ChGen>,
         IdSet: IndexedSet<ChGen> + for<'a> IndexedSetIters<'a, ChGen>,
@@ -58,7 +63,10 @@ where
         Ok(reduce)
     }
 
-    pub fn from_complexes<IdSetA, IdSetB, ChGen>(domain: &Complex<IdSetA, ChGen>, target: &Complex<IdSetB, ChGen>) -> Result<Z2ColumnReduce<V>, failure::Error>
+    pub fn from_complexes<IdSetA, IdSetB, ChGen>(
+        domain: &Complex<IdSetA, ChGen>,
+        target: &Complex<IdSetB, ChGen>,
+    ) -> Result<Z2ColumnReduce<V>, failure::Error>
     where
         V: FromIterator<(usize, Sign)>,
         ChGen: PartialEq + ChainGenerator + for<'a> ChainGeneratorBoundary<'a, ChGen>,
@@ -76,9 +84,11 @@ where
     }
 
     pub fn find_same_lowest(&self, boundary: &V) -> Option<(usize, &V)> {
-        boundary.lowest().and_then(|lowest|
-            self.lowest_memo.get(&lowest)
-                .map(|pos| (*pos, &self.reduced[*pos])))
+        boundary.lowest().and_then(|lowest| {
+            self.lowest_memo
+                .get(&lowest)
+                .map(|pos| (*pos, &self.reduced[*pos]))
+        })
     }
 
     pub fn reduce(&self, boundary: &mut V) {
@@ -108,7 +118,7 @@ where
     }
 
     pub fn into_cycles(self) -> Cycles<V> {
-        let mut cycles = Vec::with_capacity(self.reduced.len()-self.lowest_memo.len());
+        let mut cycles = Vec::with_capacity(self.reduced.len() - self.lowest_memo.len());
 
         for (index, chain) in self.reduced.into_iter() {
             if chain.is_cycle() {
@@ -116,13 +126,11 @@ where
             }
         }
 
-        Cycles {
-            cycles: cycles,
-        }
+        Cycles { cycles: cycles }
     }
 
     pub fn into_cycle_positions(self) -> CyclePositions {
-        let mut positions = Vec::with_capacity(self.reduced.len()-self.lowest_memo.len());
+        let mut positions = Vec::with_capacity(self.reduced.len() - self.lowest_memo.len());
 
         for (index, chain) in self.reduced.iter() {
             if chain.is_cycle() {
@@ -144,12 +152,12 @@ impl<V> LookupByLowest for Z2ColumnReduce<V> {
 
 pub struct CyclesIter<'a, I, V> {
     iter: I,
-    _phantom: (PhantomData<fn () -> V>, PhantomData<&'a V>),
+    _phantom: (PhantomData<fn() -> V>, PhantomData<&'a V>),
 }
 
 impl<'a, I, V> Iterator for CyclesIter<'a, I, V>
 where
-    I: Iterator<Item=(usize, &'a V)>,
+    I: Iterator<Item = (usize, &'a V)>,
     V: Z2Vector,
 {
     type Item = (usize, &'a V);
@@ -169,10 +177,8 @@ pub struct Cycles<V> {
 }
 
 impl<V> Cycles<V> {
-    pub fn iter(&self) -> impl Iterator<Item=(usize, &V)> {
-        self.cycles
-            .iter()
-            .map(|(index, chain)| (*index, chain))
+    pub fn iter(&self) -> impl Iterator<Item = (usize, &V)> {
+        self.cycles.iter().map(|(index, chain)| (*index, chain))
     }
 }
 
@@ -181,9 +187,7 @@ pub struct CyclePositions {
 }
 
 impl CyclePositions {
-    pub fn iter<'a>(&'a self) -> impl Iterator<Item=(usize, ())> + 'a {
-        self.positions
-            .iter()
-            .map(|pos| (*pos, ()))
+    pub fn iter<'a>(&'a self) -> impl Iterator<Item = (usize, ())> + 'a {
+        self.positions.iter().map(|pos| (*pos, ()))
     }
 }

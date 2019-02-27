@@ -1,9 +1,9 @@
-use teia::traits::*;
+use teia::complex;
+use teia::complex::{BoundaryFacesPositions, Complex};
 use teia::indexed_vec::IndexedVec;
 use teia::simplex;
 use teia::simplex::Simplex;
-use teia::complex;
-use teia::complex::{Complex, BoundaryFacesPositions};
+use teia::traits::*;
 use teia::z2vector::Z2VectorVec;
 
 fn main() {
@@ -100,7 +100,6 @@ fn main() {
     comp2.push(simplex![0, 1, 3]);
     comp2.push(simplex![0, 2, 3]);
     comp2.push(simplex![1, 2, 3]);
-
 
     let mut comp3 = Complex::<IndexedVec<_>, Simplex>::with_prev(&comp2);
     comp3.push(simplex![0, 1, 2, 3]);

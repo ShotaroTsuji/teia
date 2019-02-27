@@ -1,11 +1,11 @@
-use teia::traits::*;
+use teia::complex::Complex;
 use teia::indexed_vec::IndexedVec;
+use teia::pair::Pair;
 use teia::simplex;
 use teia::simplex::Simplex;
-use teia::complex::Complex;
-use teia::z2vector::*;
+use teia::traits::*;
 use teia::z2reduce::Z2ColumnReduce;
-use teia::pair::Pair;
+use teia::z2vector::*;
 
 fn main() {
     println!("# All-in-one complex example");
@@ -28,8 +28,10 @@ fn main() {
     println!("");
 
     //let reduce = Z2ColumnReduce::<Z2VectorVec>::from_complex(&comp).unwrap();
-    let reduce = Z2ColumnReduce::<Z2Chain<Z2VectorVec>>
-        ::from_complex_with(&comp, |index, image| Z2Chain::new(index, image))
+    let reduce =
+        Z2ColumnReduce::<Z2Chain<Z2VectorVec>>::from_complex_with(&comp, |index, image| {
+            Z2Chain::new(index, image)
+        })
         .unwrap();
 
     println!("{:?}", reduce);
