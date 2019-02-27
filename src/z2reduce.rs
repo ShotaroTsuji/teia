@@ -43,11 +43,11 @@ where
         Ok(reduce)
     }
 
-    pub fn from_complex_with<'a, IdVec, Gen, F, U>(complex: &'a Complex<IdVec, Gen>, mut f: F) -> Result<Z2ColumnReduce<V>, failure::Error>
+    pub fn from_complex_with<'a, IdSet, ChGen, F, U>(complex: &'a Complex<IdSet, ChGen>, mut f: F) -> Result<Z2ColumnReduce<V>, failure::Error>
     where
-        Gen: 'a + PartialEq + ChainGenerator + ChainGeneratorBoundary<'a, Gen>,
-        IdVec: IndexedSet<Gen> + IndexedSetIters<'a, Gen>,
-        <IdVec as IndexedSetIters<'a, Gen>>::Range: Clone,
+        ChGen: 'a + PartialEq + ChainGenerator + ChainGeneratorBoundary<'a, ChGen>,
+        IdSet: IndexedSet<ChGen> + IndexedSetIters<'a, ChGen>,
+        <IdSet as IndexedSetIters<'a, ChGen>>::Range: Clone,
         F: FnMut(usize, U) -> V,
         U: Z2Vector + FromIterator<(usize, Sign)>,
     {
