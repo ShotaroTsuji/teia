@@ -26,12 +26,12 @@ where
         }
     }
 
-    pub fn from_complex<'a, IdVec, Gen>(complex: &'a Complex<'a, IdVec, Gen>) -> Result<Z2ColumnReduce<V>, failure::Error>
+    pub fn from_complex<'a, IdVec, Gen>(complex: &'a Complex<IdVec, Gen>) -> Result<Z2ColumnReduce<V>, failure::Error>
     where
         V: FromIterator<(usize, Sign)>,
         Gen: 'a + PartialEq + ChainGenerator + ChainGeneratorBoundary<'a, Gen>,
-        IdVec: IndexedSet<'a, Gen>,
-        <IdVec as IndexedSet<'a, Gen>>::Range: Clone,
+        IdVec: IndexedSet<Gen> + IndexedSetIters<'a, Gen>,
+        <IdVec as IndexedSetIters<'a, Gen>>::Range: Clone,
     {
         let mut reduce = Self::new(complex.basis.index_start());
 
@@ -43,11 +43,11 @@ where
         Ok(reduce)
     }
 
-    pub fn from_complex_with<'a, IdVec, Gen, F, U>(complex: &'a Complex<'a, IdVec, Gen>, mut f: F) -> Result<Z2ColumnReduce<V>, failure::Error>
+    pub fn from_complex_with<'a, IdVec, Gen, F, U>(complex: &'a Complex<IdVec, Gen>, mut f: F) -> Result<Z2ColumnReduce<V>, failure::Error>
     where
         Gen: 'a + PartialEq + ChainGenerator + ChainGeneratorBoundary<'a, Gen>,
-        IdVec: IndexedSet<'a, Gen>,
-        <IdVec as IndexedSet<'a, Gen>>::Range: Clone,
+        IdVec: IndexedSet<Gen> + IndexedSetIters<'a, Gen>,
+        <IdVec as IndexedSetIters<'a, Gen>>::Range: Clone,
         F: FnMut(usize, U) -> V,
         U: Z2Vector + FromIterator<(usize, Sign)>,
     {
@@ -61,13 +61,13 @@ where
         Ok(reduce)
     }
 
-    pub fn from_complexes<'a, 'b, IdSetA, IdSetB, ChGen>(domain: &'a Complex<'a, IdSetA, ChGen>, target: &'b Complex<'b, IdSetB, ChGen>) -> Result<Z2ColumnReduce<V>, failure::Error>
+    pub fn from_complexes<'a, 'b, IdSetA, IdSetB, ChGen>(domain: &'a Complex<IdSetA, ChGen>, target: &'b Complex<IdSetB, ChGen>) -> Result<Z2ColumnReduce<V>, failure::Error>
     where
         V: FromIterator<(usize, Sign)>,
         ChGen: 'a + 'b + PartialEq + ChainGenerator + ChainGeneratorBoundary<'a, ChGen>,
-        IdSetA: IndexedSet<'a, ChGen>,
-        IdSetB: IndexedSet<'b, ChGen>,
-        <IdSetB as IndexedSet<'b, ChGen>>::Range: Clone,
+        IdSetA: IndexedSet<ChGen>,
+        IdSetB: IndexedSetIters<'b, ChGen>,
+        <IdSetB as IndexedSetIters<'b, ChGen>>::Range: Clone,
     {
         let mut reduce = Self::new(domain.basis.index_start());
 
@@ -104,7 +104,7 @@ where
         self.reduced.push(boundary);
     }
 
-    pub fn cycles<'a>(&'a self) -> CyclesIter<'a, <IndexedVec<V> as IndexedSet<V>>::Iter, V> {
+    pub fn cycles<'a>(&'a self) -> CyclesIter<'a, <IndexedVec<V> as IndexedSetIters<V>>::Iter, V> {
         CyclesIter {
             iter: self.reduced.iter(),
             _phantom: (PhantomData, PhantomData),

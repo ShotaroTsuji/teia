@@ -6,18 +6,20 @@ use failure::Fail;
 pub enum ComplexError {
     #[fail(display = "complex is not filtered")]
     ComplexIsNotFiltered,
+    #[fail(display = "element already exists")]
+    ElementAlreadyExists,
 }
 
 #[derive(Debug, Clone)]
-pub struct Complex<'a, V, G> {
+pub struct Complex<V, G> {
     pub basis: V,
-    _phantom: std::marker::PhantomData<&'a G>,
+    _phantom: std::marker::PhantomData<fn () -> G>,
 }
 
-impl<'a, V, G> Complex<'a, V, G>
+impl<V, G> Complex<V, G>
 where
-    G: 'a,
-    V: IndexedSet<'a, G>,
+    G: ChainGenerator,
+    V: IndexedSet<G>,
 {
     pub fn new() -> Self {
         Complex {
@@ -26,18 +28,31 @@ where
         }
     }
 
-    pub fn with_prev<'b, W: IndexedSet<'b, G>>(prev: &Complex<'b, W, G>) -> Self {
+    pub fn with_prev<'b, W: IndexedSet<G>>(prev: &Complex<W, G>) -> Self {
         Complex {
             basis: V::new(prev.basis.index_end()),
             _phantom: std::marker::PhantomData,
         }
     }
 
-    pub fn push(&mut self, elem: G) {
-        self.basis.push(elem);
+    pub fn push(&mut self, elem: G) -> Result<(), ComplexError>
+    where
+        V: for<'a> IndexedSetIters<'a, G>,
+    {
+        let result = {
+            self.basis.iter()
+                .find(|(_, gen)| !gen.inner_prod(&elem).is_zero())
+        };
+        match result {
+            Some(_) => Err(ComplexError::ElementAlreadyExists),
+            None => {
+                self.basis.push(elem);
+                Ok(())
+            },
+        }
     }
 
-    pub fn boundaries<FrIt>(&'a self) -> Boundaries<'a, 'a, V, V, G, FrIt> {
+    pub fn boundaries<'a, FrIt>(&'a self) -> Boundaries<'a, 'a, V, V, G, FrIt> {
         Boundaries {
             index: self.basis.index_start(),
             domain: &self.basis,
@@ -48,9 +63,9 @@ where
         }
     }
 
-    pub fn boundaries_from<'b, FrIt, W>(
+    pub fn boundaries_from<'a, 'b, FrIt, W>(
         &'a self,
-        other: &'b Complex<'b, W, G>,
+        other: &'b Complex<W, G>,
     ) -> Boundaries<'a, 'b, V, W, G, FrIt> {
         Boundaries {
             index: self.basis.index_start(),
@@ -75,9 +90,9 @@ pub struct Boundaries<'a, 'b, V, W, ChGen, FrIt> {
 
 impl<'a, 'b, V, W, ChGen, FrIt> Iterator for Boundaries<'a, 'b, V, W, ChGen, FrIt>
 where
-    V: IndexedSet<'a, ChGen>,
-    W: IndexedSet<'b, ChGen>,
-    <W as IndexedSet<'b, ChGen>>::Range: Clone,
+    V: IndexedSet<ChGen>,
+    W: IndexedSetIters<'b, ChGen>,
+    <W as IndexedSetIters<'b, ChGen>>::Range: Clone,
     ChGen: 'a + 'b + PartialEq + ChainGenerator + ChainGeneratorBoundary<'a, ChGen>,
     FrIt: std::iter::FromIterator<(usize, Sign)>,
 {

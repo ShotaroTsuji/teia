@@ -1,4 +1,4 @@
-use crate::traits::IndexedSet;
+use crate::traits::{IndexedSet, IndexedSetIters};
 
 #[derive(Debug, Clone)]
 pub struct IndexedVec<T> {
@@ -6,11 +6,7 @@ pub struct IndexedVec<T> {
     start: usize,
 }
 
-impl<'a, T: 'a> IndexedSet<'a, T> for IndexedVec<T> {
-    type Iter = Iter<'a, T>;
-    type IntoIter = IntoIter<T>;
-    type Range = Range<'a, T>;
-
+impl<T> IndexedSet<T> for IndexedVec<T> {
     #[inline]
     fn new(start: usize) -> Self {
         IndexedVec {
@@ -73,6 +69,12 @@ impl<'a, T: 'a> IndexedSet<'a, T> for IndexedVec<T> {
         }
         None
     }
+}
+
+impl<'a, T: 'a> IndexedSetIters<'a, T> for IndexedVec<T> {
+    type Iter = Iter<'a, T>;
+    type IntoIter = IntoIter<T>;
+    type Range = Range<'a, T>;
 
     #[inline]
     fn iter(&'a self) -> Iter<'a, T> {
@@ -110,7 +112,7 @@ pub struct Iter<'a, T> {
     _phantom: std::marker::PhantomData<&'a IndexedVec<T>>,
 }
 
-impl<'a, T> Iterator for Iter<'a, T> {
+impl<'a, T: 'a> Iterator for Iter<'a, T> {
     type Item = (usize, &'a T);
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -153,7 +155,7 @@ pub struct Range<'a, T> {
     _phantom: std::marker::PhantomData<&'a IndexedVec<T>>,
 }
 
-impl<'a, T> Iterator for Range<'a, T> {
+impl<'a, T: 'a> Iterator for Range<'a, T> {
     type Item = (usize, &'a T);
 
     fn next(&mut self) -> Option<Self::Item> {

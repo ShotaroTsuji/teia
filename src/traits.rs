@@ -21,11 +21,7 @@ pub trait ChainGenerator {
     fn is_face_of(&self, other: &Self) -> bool;
 }
 
-pub trait IndexedSet<'a, T: 'a> {
-    type Iter: Iterator<Item = (usize, &'a T)>;
-    type IntoIter: Iterator<Item = (usize, T)>;
-    type Range: Iterator<Item = (usize, &'a T)>;
-
+pub trait IndexedSet<T> {
     fn new(index: usize) -> Self;
     fn from_vec(vec: Vec<T>, start: usize) -> Self;
     fn len(&self) -> usize;
@@ -38,6 +34,13 @@ pub trait IndexedSet<'a, T: 'a> {
     fn position_within(&self, range: std::ops::Range<usize>, elem: &T) -> Option<usize>
     where
         T: PartialEq;
+}
+
+pub trait IndexedSetIters<'a, T: 'a> {
+    type Iter: Iterator<Item = (usize, &'a T)>;
+    type IntoIter: Iterator<Item = (usize, T)>;
+    type Range: Iterator<Item = (usize, &'a T)>;
+
     fn iter(&'a self) -> Self::Iter;
     fn into_iter(self) -> Self::IntoIter;
     fn range(&'a self, range: std::ops::Range<usize>) -> Self::Range;
