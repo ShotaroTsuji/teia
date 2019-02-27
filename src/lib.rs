@@ -8,7 +8,7 @@ pub mod pair;
 pub mod sign;
 pub mod traits;
 
-//pub mod reader;
+pub mod reader;
 
 /// Persistence pair
 ///

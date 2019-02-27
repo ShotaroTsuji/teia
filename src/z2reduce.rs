@@ -33,7 +33,10 @@ where
         Gen: PartialEq + ChainGenerator + for<'a> ChainGeneratorBoundary<'a, Gen>,
         IdVec: IndexedSet<Gen> + for<'a> IndexedSetIters<'a, Gen>,
     {
-        let mut reduce = Self::new(complex.basis.index_start());
+        let mut reduce = Z2ColumnReduce {
+            reduced: IndexedVec::with_capacity(complex.basis.index_start(), complex.basis.len()),
+            lowest_memo: BTreeMap::new(),
+        };
 
         for result in complex.boundaries::<V>() {
             let (_, image) = result?;
@@ -53,7 +56,10 @@ where
         F: FnMut(usize, U) -> V,
         U: Z2Vector + FromIterator<(usize, Sign)>,
     {
-        let mut reduce = Self::new(complex.basis.index_start());
+        let mut reduce = Z2ColumnReduce {
+            reduced: IndexedVec::with_capacity(complex.basis.index_start(), complex.basis.len()),
+            lowest_memo: BTreeMap::new(),
+        };
 
         for result in complex.boundaries::<U>() {
             let (index, image) = result?;
@@ -73,7 +79,10 @@ where
         IdSetA: IndexedSet<ChGen>,
         IdSetB: for<'b> IndexedSetIters<'b, ChGen>,
     {
-        let mut reduce = Self::new(domain.basis.index_start());
+        let mut reduce = Z2ColumnReduce {
+            reduced: IndexedVec::with_capacity(domain.basis.index_start(), domain.basis.len()),
+            lowest_memo: BTreeMap::new(),
+        };
 
         for result in domain.boundaries_from::<V, _>(target) {
             let (_, image) = result?;
