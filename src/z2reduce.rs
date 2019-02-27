@@ -1,7 +1,6 @@
 use std::collections::BTreeMap;
 use std::marker::PhantomData;
 use std::iter::FromIterator;
-use crate::Persistence;
 use crate::sign::Sign;
 use crate::z2vector::Z2Vector;
 use crate::traits::*;
@@ -189,42 +188,5 @@ impl CyclePositions {
         self.positions
             .iter()
             .map(|pos| (*pos, ()))
-    }
-}
-
-
-pub struct Z2Pair<'a, B, Z, C> {
-    reduce: &'a B,
-    cycles: Z,
-    _phantom: (PhantomData<&'a B>, PhantomData<fn () -> C>),
-}
-
-impl<'a, B, Z, C> Z2Pair<'a, B, Z, C>
-where
-    B: LookupByLowest,
-    Z: Iterator<Item=(usize, C)>,
-{
-    pub fn new(reduce: &'a B, cycles: Z) -> Self {
-        Z2Pair {
-            reduce: reduce,
-            cycles: cycles,
-            _phantom: (PhantomData, PhantomData),
-        }
-    }
-}
-
-impl<'a, B, Z, C> Iterator for Z2Pair<'a, B, Z, C>
-where
-    B: LookupByLowest,
-    Z: Iterator<Item=(usize, C)>,
-{
-    type Item = (Persistence<usize>, C);
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.cycles.next()
-            .map(|(index, cycle)| {
-                let boundary_pos = self.reduce.lookup_by_lowest(index);
-                (Persistence(index, boundary_pos), cycle)
-            })
     }
 }

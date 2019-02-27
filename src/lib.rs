@@ -6,6 +6,7 @@ pub mod z2reduce;
 pub mod indexed_vec;
 pub mod sign;
 pub mod traits;
+pub mod pair;
 
 //pub mod reader;
 
