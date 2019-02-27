@@ -111,6 +111,20 @@ where
         }
     }
 
+    pub fn into_cycles(self) -> Cycles<V> {
+        let mut cycles = Vec::new();
+
+        for (index, chain) in self.reduced.into_iter() {
+            if chain.is_cycle() {
+                cycles.push((index, chain));
+            }
+        }
+
+        Cycles {
+            cycles: cycles,
+        }
+    }
+
     pub fn into_cycle_positions(self) -> CyclePositions {
         let mut positions = Vec::new();
 
@@ -151,6 +165,18 @@ where
             }
         }
         None
+    }
+}
+
+pub struct Cycles<V> {
+    cycles: Vec<(usize, V)>,
+}
+
+impl<V> Cycles<V> {
+    pub fn iter(&self) -> impl Iterator<Item=(usize, &V)> {
+        self.cycles
+            .iter()
+            .map(|(index, chain)| (*index, chain))
     }
 }
 
