@@ -30,7 +30,6 @@ where
         V: FromIterator<(usize, Sign)>,
         Gen: 'a + PartialEq + ChainGenerator + ChainGeneratorBoundary<'a, Gen>,
         IdVec: IndexedSet<Gen> + IndexedSetIters<'a, Gen>,
-        <IdVec as IndexedSetIters<'a, Gen>>::Range: Clone,
     {
         let mut reduce = Self::new(complex.basis.index_start());
 
@@ -46,7 +45,6 @@ where
     where
         ChGen: 'a + PartialEq + ChainGenerator + ChainGeneratorBoundary<'a, ChGen>,
         IdSet: IndexedSet<ChGen> + IndexedSetIters<'a, ChGen>,
-        <IdSet as IndexedSetIters<'a, ChGen>>::Range: Clone,
         F: FnMut(usize, U) -> V,
         U: Z2Vector + FromIterator<(usize, Sign)>,
     {
@@ -66,7 +64,6 @@ where
         ChGen: 'a + 'b + PartialEq + ChainGenerator + ChainGeneratorBoundary<'a, ChGen>,
         IdSetA: IndexedSet<ChGen>,
         IdSetB: IndexedSetIters<'b, ChGen>,
-        <IdSetB as IndexedSetIters<'b, ChGen>>::Range: Clone,
     {
         let mut reduce = Self::new(domain.basis.index_start());
 

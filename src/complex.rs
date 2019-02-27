@@ -96,7 +96,6 @@ impl<'a, 'b, V, W, ChGen, FrIt> Iterator for Boundaries<'a, 'b, V, W, ChGen, FrI
 where
     V: IndexedSet<ChGen>,
     W: IndexedSetIters<'b, ChGen>,
-    <W as IndexedSetIters<'b, ChGen>>::Range: Clone,
     ChGen: 'a + 'b + PartialEq + ChainGenerator + ChainGeneratorBoundary<'a, ChGen>,
     FrIt: std::iter::FromIterator<(usize, Sign)>,
 {
