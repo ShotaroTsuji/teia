@@ -111,7 +111,7 @@ where
     }
 
     pub fn into_cycles(self) -> Cycles<V> {
-        let mut cycles = Vec::new();
+        let mut cycles = Vec::with_capacity(self.reduced.len()-self.lowest_memo.len());
 
         for (index, chain) in self.reduced.into_iter() {
             if chain.is_cycle() {
@@ -125,7 +125,7 @@ where
     }
 
     pub fn into_cycle_positions(self) -> CyclePositions {
-        let mut positions = Vec::new();
+        let mut positions = Vec::with_capacity(self.reduced.len()-self.lowest_memo.len());
 
         for (index, chain) in self.reduced.iter() {
             if chain.is_cycle() {
