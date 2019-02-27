@@ -16,6 +16,14 @@ impl<T> IndexedSet<T> for IndexedVec<T> {
     }
 
     #[inline]
+    fn with_capacity(start: usize, capacity: usize) -> Self {
+        IndexedVec {
+            vec: Vec::with_capacity(capacity),
+            start: start,
+        }
+    }
+
+    #[inline]
     fn from_vec(vec: Vec<T>, start: usize) -> Self {
         IndexedVec {
             vec: vec,

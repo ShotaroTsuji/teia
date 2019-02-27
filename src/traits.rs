@@ -23,6 +23,7 @@ pub trait ChainGenerator {
 
 pub trait IndexedSet<T> {
     fn new(index: usize) -> Self;
+    fn with_capacity(index: usize, capacity: usize) -> Self;
     fn from_vec(vec: Vec<T>, start: usize) -> Self;
     fn len(&self) -> usize;
     fn index_start(&self) -> usize;
