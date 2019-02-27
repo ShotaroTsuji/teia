@@ -23,6 +23,7 @@ pub trait ChainGenerator {
 
 pub trait IndexedSet<'a, T: 'a> {
     type Iter: Iterator<Item = (usize, &'a T)>;
+    type IntoIter: Iterator<Item = (usize, T)>;
     type Range: Iterator<Item = (usize, &'a T)>;
 
     fn new(index: usize) -> Self;
@@ -38,6 +39,7 @@ pub trait IndexedSet<'a, T: 'a> {
     where
         T: PartialEq;
     fn iter(&'a self) -> Self::Iter;
+    fn into_iter(self) -> Self::IntoIter;
     fn range(&'a self, range: std::ops::Range<usize>) -> Self::Range;
 }
 

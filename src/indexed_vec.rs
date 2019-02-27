@@ -8,6 +8,7 @@ pub struct IndexedVec<T> {
 
 impl<'a, T: 'a> IndexedSet<'a, T> for IndexedVec<T> {
     type Iter = Iter<'a, T>;
+    type IntoIter = IntoIter<T>;
     type Range = Range<'a, T>;
 
     #[inline]
@@ -83,6 +84,15 @@ impl<'a, T: 'a> IndexedSet<'a, T> for IndexedVec<T> {
     }
 
     #[inline]
+    fn into_iter(self) -> IntoIter<T> {
+        let start = self.start;
+        IntoIter {
+            ivec: self,
+            index: start,
+        }
+    }
+
+    #[inline]
     fn range(&'a self, range: std::ops::Range<usize>) -> Range<'a, T> {
         Range {
             ivec: &self,
@@ -106,6 +116,27 @@ impl<'a, T> Iterator for Iter<'a, T> {
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.ivec.index_end() {
             let pair = (self.index, &self.ivec[self.index]);
+            self.index += 1;
+            Some(pair)
+        } else {
+            None
+        }
+    }
+}
+
+pub struct IntoIter<T> {
+    ivec: IndexedVec<T>,
+    index: usize,
+}
+
+impl<T> Iterator for IntoIter<T> {
+    type Item = (usize, T);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.ivec.index_end() {
+            let uninit: T = unsafe { std::mem::zeroed() };
+            let data = std::mem::replace(&mut self.ivec[self.index], uninit);
+            let pair = (self.index, data);
             self.index += 1;
             Some(pair)
         } else {
