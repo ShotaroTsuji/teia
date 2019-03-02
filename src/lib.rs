@@ -22,7 +22,7 @@ pub struct Persistence<T>(pub T, pub Option<T>);
 
 impl<T> Persistence<T> {
     pub fn is_essential(&self) -> bool {
-        self.1.is_some()
+        self.1.is_none()
     }
 }
 
