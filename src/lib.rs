@@ -20,6 +20,12 @@ pub mod reader;
 #[derive(Debug, Clone, Copy)]
 pub struct Persistence<T>(pub T, pub Option<T>);
 
+impl<T> Persistence<T> {
+    pub fn is_essential(&self) -> bool {
+        self.1.is_some()
+    }
+}
+
 trait IteratorExclude: Iterator
 where
     Self: Sized,
