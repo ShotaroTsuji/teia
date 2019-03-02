@@ -18,12 +18,14 @@ struct Opt {
 
 #[derive(Debug, StructOpt)]
 enum Command {
+    /// Compute the generators of homology groups
     #[structopt(name = "homology")]
     Homology(ComputeHomology),
 }
 
 #[derive(Debug, StructOpt)]
 struct ComputeHomology {
+    /// Input file path
     #[structopt(name = "INPUT", parse(from_os_str))]
     input: PathBuf,
 }
