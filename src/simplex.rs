@@ -12,20 +12,23 @@ macro_rules! simplex {
 
 /// The struct represents simplex
 ///
-/// This struct represents a simplex, which is a set of vertices with orientation.
+/// This struct represents a simplex, which is a set of vertices.
 #[derive(Debug, PartialEq, Clone)]
 pub struct Simplex {
-    /// The vertices ordered in descending order.
+    /// The vertices ordered in ascending order.
     vertices: Vec<usize>,
 }
 
 impl std::fmt::Display for Simplex {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "< ")?;
-        for v in self.vertices.iter() {
-            write!(f, "{} ", v)?;
+        write!(f, "|")?;
+        for i in 0..self.vertices.len() {
+            write!(f, "{}", self.vertices[i])?;
+            if i < self.vertices.len()-1 {
+                write!(f, " ")?;
+            }
         }
-        write!(f, ">")
+        write!(f, "|")
     }
 }
 

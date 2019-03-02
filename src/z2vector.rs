@@ -13,10 +13,16 @@ pub trait Z2Vector {
     fn add_assign(&mut self, other: &Self);
 }
 
+pub trait Z2VectorIter<'a> {
+    type Iter: Iterator<Item=&'a usize>;
+
+    fn iter(&'a self) -> Self::Iter;
+}
+
 #[derive(Debug, Clone)]
 pub struct Z2Chain<V> {
-    chain: V,
-    boundary: V,
+    pub chain: V,
+    pub image: V,
 }
 
 impl<V> Z2Chain<V>
@@ -26,7 +32,7 @@ where
     pub fn new(index: usize, image: V) -> Self {
         Z2Chain {
             chain: V::from(vec![index]),
-            boundary: image,
+            image: image,
         }
     }
 }
@@ -36,12 +42,12 @@ where
     V: Z2Vector,
 {
     fn lowest(&self) -> Option<usize> {
-        self.boundary.lowest()
+        self.image.lowest()
     }
 
     fn add_assign(&mut self, other: &Self) {
         self.chain.add_assign(&other.chain);
-        self.boundary.add_assign(&other.boundary);
+        self.image.add_assign(&other.image);
     }
 }
 
@@ -110,6 +116,14 @@ impl Z2Vector for Z2VectorVec {
             }
         }
         *self = Z2VectorVec { vec: result };
+    }
+}
+
+impl<'a> Z2VectorIter<'a> for Z2VectorVec {
+    type Iter = std::slice::Iter<'a, usize>;
+
+    fn iter(&'a self) -> Self::Iter {
+        self.vec.iter()
     }
 }
 
