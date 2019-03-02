@@ -33,11 +33,10 @@ impl std::fmt::Display for Simplex {
 }
 
 impl Simplex {
-    /// Create new simplex from vertices and orientation
+    /// Create new simplex from vertices.
     ///
-    /// This method creates a new simplex from vertices and orientation.
-    /// The vertices are sorted in descending order by this method.
-    /// The order of vertices in `vertices` is ignored.
+    /// This method creates a new simplex from `vertices`.
+    /// The `vertices` are sorted in ascending order by this method.
     pub fn new(mut vertices: Vec<usize>) -> Simplex {
         assert!(vertices.len() > 0);
         vertices.sort();
