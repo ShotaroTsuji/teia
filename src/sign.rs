@@ -1,5 +1,7 @@
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Sign(i8);
+
+impl Eq for Sign {}
 
 impl Sign {
     #[inline]
