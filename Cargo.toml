@@ -7,4 +7,5 @@ edition = "2018"
 [dependencies]
 num-traits = "0.2"
 failure = "*"
+structopt = "*"
 botao = { git = "https://github.com/ShotaroTsuji/botao.git" }

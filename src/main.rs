@@ -1,39 +1,80 @@
-use teia::complex;
-use teia::complex::BoundaryFacesPositions;
-use teia::complex::Complex;
-use teia::indexed_vec::IndexedVec;
-use teia::simplex;
-use teia::simplex::Simplex;
 use teia::traits::*;
-use teia::z2vector::{Z2Vector, Z2VectorVec};
+use teia::simplex::Simplex;
+use teia::z2vector::{Z2Chain, Z2VectorIter, Z2VectorVec};
+use teia::z2reduce::Z2ColumnReduce;
+use teia::pair::Pair;
+use teia::reader;
+use std::collections::BTreeMap;
+use std::path::PathBuf;
+use std::io::BufReader;
+use std::fs::File;
+use structopt::StructOpt;
 
-fn test_simplex() {
-    println!("# test_simplex");
+#[derive(Debug, StructOpt)]
+struct Opt {
+    #[structopt(subcommand)]
+    command: Command,
+}
 
-    let s = simplex![0, 1, 2, 3];
-    println!("## Debug print");
-    println!("    {}", s);
+#[derive(Debug, StructOpt)]
+enum Command {
+    #[structopt(name = "homology")]
+    Homology(ComputeHomology),
+}
 
-    println!("s.dimension() = {}", s.dimension());
-    println!("s.vertices() :");
-    for v in s.vertices() {
-        println!("  {}", v);
+#[derive(Debug, StructOpt)]
+struct ComputeHomology {
+    #[structopt(name = "INPUT", parse(from_os_str))]
+    input: PathBuf,
+}
+
+fn compute_homology(cmd: ComputeHomology) {
+    let file = File::open(cmd.input).unwrap();
+
+    let comp = reader::simpcomp::read_simpcomp_text(BufReader::new(file)).unwrap();
+
+    let reduce = Z2ColumnReduce::<Z2Chain<Z2VectorVec>>
+            ::from_complex_with(&comp, |index, chain| Z2Chain::new(index, chain)).unwrap();
+
+    let generators = Pair::new(&reduce, reduce.cycles())
+        .filter(|pair| pair.0.is_essential())
+        .map(|(_, chain)| {
+            chain.chain
+                .iter()
+                .map(|index| &comp.basis[*index])
+                .collect::<Vec<&Simplex>>()
+        })
+        .collect::<Vec<_>>();
+
+    let mut gen_dict = BTreeMap::<usize, Vec<Vec<&Simplex>>>::new();
+
+    for generator in generators.into_iter() {
+        match gen_dict.get_mut(&generator[0].dimension()) {
+            Some(vec) => {
+                vec.push(generator);
+            },
+            None => {
+                gen_dict.insert(generator[0].dimension(), vec![generator]);
+            },
+        }
     }
-    println!("s.boundary() :");
-    for t in s.boundary() {
-        println!("  {}", t);
+
+    for (dim, generators) in gen_dict.iter() {
+        println!("# dim {}", dim);
+        for gen in generators.iter() {
+            print!("[");
+            for simp in gen.iter() {
+                print!("{},", simp);
+            }
+            println!("]");
+        }
     }
-
-    let t = simplex![1, 3];
-    println!("t = {}", t);
-    println!("t.is_face_of(&s) = {}", t.is_face_of(&s));
-    println!("s.inner_prod(&t) = {}", s.inner_prod(&t));
-
-    let u = simplex![1, 4];
-    println!("u = {}", u);
-    println!("u.is_face_of(&s) = {}", u.is_face_of(&s));
 }
 
 fn main() {
-    test_simplex();
+    let opt = Opt::from_args();
+
+    match opt.command {
+        Command::Homology(cmd) => compute_homology(cmd),
+    }
 }
