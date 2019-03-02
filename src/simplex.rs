@@ -47,7 +47,7 @@ impl Simplex {
 impl<'a> ChainGeneratorVertices<'a> for Simplex {
     type VerticesIter = Vertices<'a>;
 
-    /// Returns the reference to the slice of vertices
+    /// Returns an iterator that produces the vertices of `self`.
     fn vertices(&'a self) -> Vertices<'a> {
         Vertices {
             iter: self.vertices.iter(),
@@ -59,6 +59,7 @@ impl<'a> ChainGeneratorVertices<'a> for Simplex {
 impl<'a> ChainGeneratorBoundary<'a, Simplex> for Simplex {
     type BoundaryIter = Boundary<'a>;
 
+    /// Returns an iteratro that produces the faces of the boundary of `self`.
     fn boundary(&self) -> Boundary {
         Boundary {
             simplex: &self,
@@ -73,19 +74,33 @@ impl ChainGenerator for Simplex {
     ///
     /// # Example
     /// ```
-    /// use teia::Orientation;
+    /// use teia::traits::*;
     /// use teia::simplex::Simplex;
     ///
-    /// let s = Simplex::new(vec![0], Orientation::Positive);
+    /// let s = Simplex::new(vec![0]);
     /// assert_eq!(s.dimension(), 0);
     ///
-    /// let s = Simplex::new(vec![3, 4, 8, 10], Orientation::Positive);
+    /// let s = Simplex::new(vec![3, 4, 8, 10]);
     /// assert_eq!(s.dimension(), 3);
     /// ```
     fn dimension(&self) -> usize {
         self.vertices.len() - 1
     }
 
+    /// Returns the coefficient of the inner production.
+    ///
+    /// # Example
+    /// ```
+    /// use teia::traits::*;
+    /// use teia::simplex::Simplex;
+    /// use teia::sign::Sign;
+    ///
+    /// let s = Simplex::new(vec![0,1]);
+    /// let t = Simplex::new(vec![0,2]);
+    ///
+    /// assert_eq!(s.inner_prod(&s).is_positive(), true);
+    /// assert_eq!(s.inner_prod(&t).is_zero(), true);
+    /// ```
     fn inner_prod(&self, other: &Simplex) -> Sign {
         if self.vertices == other.vertices {
             Sign::positive()
@@ -101,11 +116,12 @@ impl ChainGenerator for Simplex {
     ///
     /// # Example
     /// ```
-    /// use teia::Orientation;
+    /// use teia::traits::*;
     /// use teia::simplex::Simplex;
     ///
-    /// let s = Simplex::new(vec![0,1,2,3], Orientation::Positive);
-    /// let t = Simplex::new(vec![1,3], Orientation::Positive);
+    /// let s = Simplex::new(vec![0,1,2,3]);
+    /// let t = Simplex::new(vec![1,3]);
+    ///
     /// assert_eq!(t.is_face_of(&s), true);
     /// ```
     fn is_face_of(&self, other: &Simplex) -> bool {
@@ -160,31 +176,31 @@ impl<'a> Iterator for Boundary<'a> {
 
 #[cfg(test)]
 mod tests {
+    use crate::traits::*;
     use crate::simplex::Simplex;
-    use crate::Orientation;
 
     #[test]
     fn test_simplex_boundary() {
-        let simplex = Simplex::new(vec![0, 1, 2, 3], Orientation::Positive);
+        let simplex = Simplex::new(vec![0, 1, 2, 3]);
         let boundary = simplex.boundary().collect::<Vec<Simplex>>();
         assert_eq!(
             boundary,
             vec![
-                Simplex::new(vec![1, 2, 3], Orientation::Positive),
-                Simplex::new(vec![0, 2, 3], Orientation::Negative),
-                Simplex::new(vec![0, 1, 3], Orientation::Positive),
-                Simplex::new(vec![0, 1, 2], Orientation::Negative)
+                Simplex::new(vec![1, 2, 3]),
+                Simplex::new(vec![0, 2, 3]),
+                Simplex::new(vec![0, 1, 3]),
+                Simplex::new(vec![0, 1, 2]),
             ]
         );
     }
 
     #[test]
     fn test_simplex_face() {
-        let s: Simplex = Simplex::new(vec![0, 1, 2, 3], Orientation::Positive);
-        let t: Simplex = Simplex::new(vec![0, 1, 3], Orientation::Positive);
+        let s: Simplex = Simplex::new(vec![0, 1, 2, 3]);
+        let t: Simplex = Simplex::new(vec![0, 1, 3]);
         test_simplex_face_inner(&s, &t);
 
-        let t: Simplex = Simplex::new(vec![0, 2, 3], Orientation::Positive);
+        let t: Simplex = Simplex::new(vec![0, 2, 3]);
         test_simplex_face_inner(&s, &t);
     }
 

@@ -1,5 +1,5 @@
 use teia::indexed_vec::IndexedVec;
-use teia::traits::IndexedSet;
+use teia::traits::{IndexedSet, IndexedSetIters};
 
 fn main() {
     let mut vec = IndexedVec::<usize>::new(10);

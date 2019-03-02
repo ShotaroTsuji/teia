@@ -10,14 +10,14 @@ fn main() {
     println!("# All-in-one complex example");
     let mut comp: Complex<IndexedVec<_>, _> = Complex::new();
 
-    comp.push(simplex![0]);
-    comp.push(simplex![1]);
-    comp.push(simplex![2]);
-    comp.push(simplex![0, 1]);
-    comp.push(simplex![0, 2]);
-    comp.push(simplex![1, 2]);
-    comp.push(simplex![0, 1, 2]);
-    comp.push(simplex![0, 1, 2, 3]);
+    comp.push(simplex![0]).unwrap();
+    comp.push(simplex![1]).unwrap();
+    comp.push(simplex![2]).unwrap();
+    comp.push(simplex![0, 1]).unwrap();
+    comp.push(simplex![0, 2]).unwrap();
+    comp.push(simplex![1, 2]).unwrap();
+    comp.push(simplex![0, 1, 2]).unwrap();
+    comp.push(simplex![0, 1, 2, 3]).unwrap();
 
     println!("");
 
@@ -82,27 +82,27 @@ fn main() {
     println!("# Separated complex example");
 
     let mut comp0 = Complex::<IndexedVec<_>, Simplex>::new();
-    comp0.push(simplex![0]);
-    comp0.push(simplex![1]);
-    comp0.push(simplex![2]);
-    comp0.push(simplex![3]);
+    comp0.push(simplex![0]).unwrap();
+    comp0.push(simplex![1]).unwrap();
+    comp0.push(simplex![2]).unwrap();
+    comp0.push(simplex![3]).unwrap();
 
     let mut comp1 = Complex::<IndexedVec<_>, Simplex>::with_prev(&comp0);
-    comp1.push(simplex![0, 1]);
-    comp1.push(simplex![0, 2]);
-    comp1.push(simplex![0, 3]);
-    comp1.push(simplex![1, 2]);
-    comp1.push(simplex![1, 3]);
-    comp1.push(simplex![2, 3]);
+    comp1.push(simplex![0, 1]).unwrap();
+    comp1.push(simplex![0, 2]).unwrap();
+    comp1.push(simplex![0, 3]).unwrap();
+    comp1.push(simplex![1, 2]).unwrap();
+    comp1.push(simplex![1, 3]).unwrap();
+    comp1.push(simplex![2, 3]).unwrap();
 
     let mut comp2 = Complex::<IndexedVec<_>, Simplex>::with_prev(&comp1);
-    comp2.push(simplex![0, 1, 2]);
-    comp2.push(simplex![0, 1, 3]);
-    comp2.push(simplex![0, 2, 3]);
-    comp2.push(simplex![1, 2, 3]);
+    comp2.push(simplex![0, 1, 2]).unwrap();
+    comp2.push(simplex![0, 1, 3]).unwrap();
+    comp2.push(simplex![0, 2, 3]).unwrap();
+    comp2.push(simplex![1, 2, 3]).unwrap();
 
     let mut comp3 = Complex::<IndexedVec<_>, Simplex>::with_prev(&comp2);
-    comp3.push(simplex![0, 1, 2, 3]);
+    comp3.push(simplex![0, 1, 2, 3]).unwrap();
 
     println!("");
     println!("## Complex 0");
