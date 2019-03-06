@@ -26,6 +26,8 @@ Then you clone this repository with `git clone https://github.com/ShotaroTsuji/t
 
 - Simplicial complex (text file) : A simplex is represented as numbers separated with whitespace. Each simplex is written in each line.
 
+There is the example files `examples/torus.txt` and `examples/cube.txt`.
+
 ## Future work
 
 - [ ] Construction of the filtration from given filtration values.
