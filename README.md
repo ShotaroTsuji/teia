@@ -8,14 +8,15 @@ This crate provides
 - Column reduction algorithm
 - Persistence pairing algorithm
 
-## Command line interface
-
-The CLI program has two subcommands: `homology` and `persistence`.
-
 ## How to build
 
 First, if you not have Rust environment, you get it from [https://rustup.rs/](https://rustup.rs/) and install it.
 Then you clone this repository with `git clone https://github.com/ShotaroTsuji/teia` and build it with `cargo build --release`.
+
+## Command line interface
+
+The CLI program has two subcommands: `homology` and `persistence`.
+The program can be launched with `cargo run -- homology <INPUT>` in the repository directory.
 
 ### Subcommands
 
