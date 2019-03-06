@@ -1,6 +1,7 @@
+use teia::Persistence;
 use teia::traits::*;
 use teia::simplex::Simplex;
-use teia::z2vector::{Z2Chain, Z2VectorIter, Z2VectorVec};
+use teia::z2vector::{Z2Chain, Z2Vector, Z2VectorIter, Z2VectorVec};
 use teia::z2reduce::Z2ColumnReduce;
 use teia::pair::Pair;
 use teia::reader;
@@ -18,9 +19,49 @@ struct Opt {
 
 #[derive(Debug, StructOpt)]
 enum Command {
-    /// Compute the generators of homology groups
+    /// Compute the generators of homology groups.
+    ///
+    /// This subcommand computes the generators of homology groups of the given complex.
+    /// The argument `INPUT` is the file path to the input file.
+    /// The generators of each dimension are printed to the standard output.
+    /// A generator is printed as a list of simplices in a line.
     #[structopt(name = "homology")]
     Homology(ComputeHomology),
+    /// Compute the persistence of complex.
+    ///
+    /// This subcommand computes the persistent homology groups of the given complex.
+    /// The argument `INPUT` is the file path to the input file.
+    /// It prints birth index, death index and dimension separated by a whitespace.
+    #[structopt(name = "persistence")]
+    Persistence(ComputePersistence),
+}
+
+#[derive(Debug, StructOpt)]
+struct ComputePersistence {
+    /// Input file path
+    #[structopt(name = "INPUT", parse(from_os_str))]
+    input: PathBuf,
+}
+
+fn compute_persistence(cmd: ComputePersistence) {
+    let file = File::open(cmd.input).unwrap();
+
+    let comp = reader::simpcomp::read_simpcomp_text(BufReader::new(file)).unwrap();
+
+    let reduce = Z2ColumnReduce::<Z2Chain<Z2VectorVec>>
+            ::from_complex_with(&comp, |index, chain| Z2Chain::new(index, chain)).unwrap();
+
+    for (pers, chain) in Pair::new(&reduce, reduce.cycles()) {
+        match pers {
+            Persistence(birth, Some(death)) => {
+                print!("{} {}", birth, death);
+            },
+            Persistence(birth, None) => {
+                print!("{} inf", birth);
+            },
+        };
+        println!(" {}", comp.basis[chain.chain.lowest().unwrap()].dimension());
+    }
 }
 
 #[derive(Debug, StructOpt)]
@@ -78,5 +119,6 @@ fn main() {
 
     match opt.command {
         Command::Homology(cmd) => compute_homology(cmd),
+        Command::Persistence(cmd) => compute_persistence(cmd),
     }
 }
