@@ -12,7 +12,7 @@ This crate provides
 
 The CLI program has two subcommands: `homology` and `persistence`.
 
-## Subcommands
+### Subcommands
 
 - `homology` : computes the generators of the homology groups of the given complex.
 - `persistence` : computes the persistent homology groups of the given complex.
@@ -20,3 +20,10 @@ The CLI program has two subcommands: `homology` and `persistence`.
 ### Input file format
 
 - Simplicial complex (text file) : A simplex is represented as numbers separated with whitespace. Each simplex is written in each line.
+
+## Future work
+
+- [ ] Construction of the filtration from given filtration values.
+- [ ] Persistent cohomology algorithm.
+- [ ] Lower-star complex.
+- [ ] Vietoris-Rips complex.
