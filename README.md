@@ -12,6 +12,11 @@ This crate provides
 
 The CLI program has two subcommands: `homology` and `persistence`.
 
+## How to build
+
+First, if you not have Rust environment, you get it from [https://rustup.rs/](https://rustup.rs/) and install it.
+Then you clone this repository with `git clone https://github.com/ShotaroTsuji/teia` and build it with `cargo build --release`.
+
 ### Subcommands
 
 - `homology` : computes the generators of the homology groups of the given complex.
