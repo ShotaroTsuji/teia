@@ -11,6 +11,6 @@ edition = "2018"
 
 [dependencies]
 num-traits = "0.2"
-failure = "*"
-structopt = "*"
+failure = "0.1.5"
+structopt = "0.2.14"
 botao = "0.1.0"
