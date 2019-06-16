@@ -1,7 +1,20 @@
-/// Sign of number
+/// Sign of coefficients
 ///
 /// This struct represents the coefficient of number limited to +1, -1 and zero.
 /// It supports the multiplication.
+///
+/// # Examples
+/// The multiplication is done as follows:
+/// ```
+/// use teia::sign::Sign;
+///
+/// assert_eq!(Sign::positive()*Sign::positive(), Sign::positive());
+/// assert_eq!(Sign::positive()*Sign::negative(), Sign::negative());
+/// assert_eq!(Sign::negative()*Sign::negative(), Sign::positive());
+/// assert_eq!(Sign::positive()*Sign::zero(), Sign::zero());
+/// assert_eq!(Sign::negative()*Sign::zero(), Sign::zero());
+/// assert_eq!(Sign::zero()*Sign::zero(), Sign::zero());
+/// ```
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Sign(i8);
 
@@ -45,6 +58,15 @@ impl Sign {
     ///
     /// If `self` is +1 or -1, it is converted into `Some(self)`.
     /// Otherwise it is converted into `None`.
+    ///
+    /// # Examples
+    /// ```
+    /// use teia::sign::Sign;
+    ///
+    /// assert_eq!(Sign::positive().into_option(), Some(Sign::positive()));
+    /// assert_eq!(Sign::negative().into_option(), Some(Sign::negative()));
+    /// assert_eq!(Sign::zero().into_option(), None);
+    /// ```
     #[inline]
     pub fn into_option(self) -> Option<Sign> {
         if self.0 == 0 {
