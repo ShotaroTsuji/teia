@@ -1,19 +1,26 @@
+/// Sign of number
+///
+/// This struct represents the coefficient of number limited to +1, -1 and zero.
+/// It supports the multiplication.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Sign(i8);
 
 impl Eq for Sign {}
 
 impl Sign {
+    /// Creates a +1
     #[inline]
     pub fn positive() -> Sign {
         Sign(1i8)
     }
 
+    /// Creates a -1
     #[inline]
     pub fn negative() -> Sign {
         Sign(-1i8)
     }
 
+    /// Createz a 0
     #[inline]
     pub fn zero() -> Sign {
         Sign(0)
@@ -34,6 +41,10 @@ impl Sign {
         self.0 == 0
     }
 
+    /// Make `self` into `Option<Sign>`
+    ///
+    /// If `self` is +1 or -1, it is converted into `Some(self)`.
+    /// Otherwise it is converted into `None`.
     #[inline]
     pub fn into_option(self) -> Option<Sign> {
         if self.0 == 0 {
