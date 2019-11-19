@@ -10,6 +10,7 @@ pub enum ComplexError {
     ElementAlreadyExists,
 }
 
+/// A representation of filtered complex.
 #[derive(Debug, Clone)]
 pub struct Complex<V, G> {
     pub basis: V,
@@ -35,6 +36,11 @@ where
         }
     }
 
+    /// Appends an element to the back of a complex.
+    ///
+    /// # Errors
+    /// This function will return an error if `elem` already exists.
+    /// Moreover it will return an error if the faces of `elem` do not exist in a complex.
     pub fn push(&mut self, elem: G) -> Result<(), ComplexError>
     where
         V: for<'a> IndexedSetIters<'a, G>,
