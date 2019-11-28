@@ -109,7 +109,7 @@ fn emit_vr_svg<W: io::Write>(w: &mut W, points: &[DVector<f64>], pairs: &[(Vec<u
     let points_svg = emit_svg_points(points, &vertices[..], 0.01, FillStyle { color: "black".into(), opacity: 1.0 }, spec);
     //let balls_svg = emit_svg_points(&circle, pairs[29].1/2.0, "pink", 0.3, spec);
     let edges_svg = emit_svg_edges(points, &edges[..], StrokeStyle { color: "black".into(), width: 0.005 }, spec);
-    let triangles_svg = emit_svg_triangles(points, &triangles[..], FillStyle { color: "indigo".into(), opacity: 0.2 }, spec);
+    let triangles_svg = emit_svg_triangles(points, &triangles[..], FillStyle { color: "#191970".into(), opacity: 0.2 }, spec);
 
     writeln!(w, r#"<?xml version="1.0" standalone="no"?>"#)?;
     writeln!(w, r#"<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">"#)?;
@@ -135,7 +135,7 @@ fn emit_balls_svg<W: io::Write>(w: &mut W, points: &[DVector<f64>], pairs: &[(Ve
 
     let spec = DrawSpec { scale: 300.0, size: 1000.0 };
     let points_svg = emit_svg_points(points, &vertices[..], 0.01, FillStyle { color: "black".into(), opacity: 1.0 }, spec);
-    let balls_svg = emit_svg_points(points, &vertices[..], pairs[max_index].1/2.0, FillStyle { color: "pink".into(), opacity: 0.2 }, spec);
+    let balls_svg = emit_svg_points(points, &vertices[..], pairs[max_index].1/2.0, FillStyle { color: "#FFB7C5".into(), opacity: 0.5 }, spec);
 
     writeln!(w, r#"<?xml version="1.0" standalone="no"?>"#)?;
     writeln!(w, r#"<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">"#)?;
@@ -191,13 +191,13 @@ fn main() {
     eprintln!("## {} simplices", pairs.len());
 
     for index in 0..pairs.len() {
-        let name = format!("vr/vr-comp-{}-{:.4}.svg", index, pairs[index].1);
+        let name = format!("vr/vr-comp-{}-{:.3}.svg", index, pairs[index].1);
         eprintln!("{}", name);
         let f = File::create(name).unwrap();
         let mut w = BufWriter::new(f);
         emit_vr_svg(&mut w, &circle, &pairs, index+1).unwrap();
 
-        let name = format!("vr/vr-ball-{}-{:.4}.svg", index, pairs[index].1);
+        let name = format!("vr/vr-ball-{}-{:.3}.svg", index, pairs[index].1);
         eprintln!("{}", name);
         let f = File::create(name).unwrap();
         let mut w = BufWriter::new(f);
