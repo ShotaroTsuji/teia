@@ -14,3 +14,7 @@ num-traits = "0.2"
 failure = "0.1.5"
 structopt = "0.2.14"
 botao = "0.1.0"
+itertools = "0.8.1"
+
+[dev-dependencies]
+nalgebra = "0.18"

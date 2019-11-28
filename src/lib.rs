@@ -3,6 +3,8 @@ pub mod simplex;
 pub mod z2reduce;
 pub mod z2vector;
 
+pub mod vietoris_rips;
+
 pub mod indexed_vec;
 pub mod pair;
 pub mod sign;
