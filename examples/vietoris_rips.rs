@@ -2,7 +2,14 @@ use std::fmt::Write;
 use std::io;
 use std::io::BufWriter;
 use std::fs::File;
+use teia::Persistence;
 use teia::vietoris_rips::{DistanceMatrix, enumerate_simplices};
+use teia::simplex::Simplex;
+use teia::complex::Complex;
+use teia::indexed_vec::IndexedVec;
+use teia::z2vector::{Z2Chain, Z2VectorVec};
+use teia::z2reduce::Z2ColumnReduce;
+use teia::pair::Pair;
 use nalgebra::DVector;
 
 #[derive(Debug, Clone)]
@@ -101,14 +108,9 @@ fn emit_vr_svg<W: io::Write>(w: &mut W, points: &[DVector<f64>], pairs: &[(Vec<u
         }
     }
 
-    eprintln!("{:?}", vertices);
-    eprintln!("{:?}", edges);
-    eprintln!("{:?}", triangles);
-
-    let spec = DrawSpec { scale: 300.0, size: 1000.0 };
-    let points_svg = emit_svg_points(points, &vertices[..], 0.01, FillStyle { color: "black".into(), opacity: 1.0 }, spec);
-    //let balls_svg = emit_svg_points(&circle, pairs[29].1/2.0, "pink", 0.3, spec);
-    let edges_svg = emit_svg_edges(points, &edges[..], StrokeStyle { color: "black".into(), width: 0.005 }, spec);
+    let spec = DrawSpec { scale: 250.0, size: 1000.0 };
+    let points_svg = emit_svg_points(points, &vertices[..], 0.05, FillStyle { color: "black".into(), opacity: 1.0 }, spec);
+    let edges_svg = emit_svg_edges(points, &edges[..], StrokeStyle { color: "black".into(), width: 0.01 }, spec);
     let triangles_svg = emit_svg_triangles(points, &triangles[..], FillStyle { color: "#191970".into(), opacity: 0.2 }, spec);
 
     writeln!(w, r#"<?xml version="1.0" standalone="no"?>"#)?;
@@ -131,10 +133,8 @@ fn emit_balls_svg<W: io::Write>(w: &mut W, points: &[DVector<f64>], pairs: &[(Ve
         }
     }
 
-    eprintln!("{:?}", vertices);
-
-    let spec = DrawSpec { scale: 300.0, size: 1000.0 };
-    let points_svg = emit_svg_points(points, &vertices[..], 0.01, FillStyle { color: "black".into(), opacity: 1.0 }, spec);
+    let spec = DrawSpec { scale: 250.0, size: 1000.0 };
+    let points_svg = emit_svg_points(points, &vertices[..], 0.05, FillStyle { color: "black".into(), opacity: 1.0 }, spec);
     let balls_svg = emit_svg_points(points, &vertices[..], pairs[max_index].1/2.0, FillStyle { color: "#FFB7C5".into(), opacity: 0.5 }, spec);
 
     writeln!(w, r#"<?xml version="1.0" standalone="no"?>"#)?;
@@ -161,15 +161,15 @@ fn generate_circle(n: usize) -> Vec<DVector<f64>> {
 }
 
 fn main() {
-    let circle = generate_circle(6);
+    let circle = generate_circle(12);
 
-    let dist = DistanceMatrix::from_fn(6, |i, j| {
+    let dist = DistanceMatrix::from_fn(circle.len(), |i, j| {
         let a = circle[i].clone() - &circle[j];
         a.norm()
     });
 
-    for i in 0..6 {
-        for j in 0..6 {
+    for i in 0..circle.len() {
+        for j in 0..circle.len() {
             eprint!("{:.3} ", dist.get(i, j).unwrap());
         }
         eprintln!("");
@@ -178,7 +178,7 @@ fn main() {
     let mut pairs = Vec::new();
 
     for q in 0..3 {
-        let mut q_pairs = enumerate_simplices(6, q, &dist);
+        let mut q_pairs = enumerate_simplices(circle.len(), q, &dist);
         pairs.append(&mut q_pairs);
     }
 
@@ -191,16 +191,49 @@ fn main() {
     eprintln!("## {} simplices", pairs.len());
 
     for index in 0..pairs.len() {
-        let name = format!("vr/vr-comp-{}-{:.3}.svg", index, pairs[index].1);
-        eprintln!("{}", name);
+        let name = format!("vr2/vr-comp-{}-{:.3}.svg", index, pairs[index].1);
         let f = File::create(name).unwrap();
         let mut w = BufWriter::new(f);
         emit_vr_svg(&mut w, &circle, &pairs, index+1).unwrap();
 
-        let name = format!("vr/vr-ball-{}-{:.3}.svg", index, pairs[index].1);
-        eprintln!("{}", name);
+        let name = format!("vr2/vr-ball-{}-{:.3}.svg", index, pairs[index].1);
         let f = File::create(name).unwrap();
         let mut w = BufWriter::new(f);
         emit_balls_svg(&mut w, &circle, &pairs, index).unwrap();
+    }
+
+    let mut comp: Complex<IndexedVec<_>, _> = Complex::new();
+    for (simp, _) in pairs.iter() {
+        comp.push(Simplex::new(simp.to_vec())).unwrap();
+    }
+
+    for chain in comp.boundaries::<Z2VectorVec>() {
+        eprintln!("{:?}", chain);
+    }
+
+    let reduce =
+        Z2ColumnReduce::<Z2Chain<Z2VectorVec>>::from_complex_with(&comp, |index, image| {
+            Z2Chain::new(index, image)
+        })
+        .unwrap();
+
+    println!("## cycles");
+    for c in reduce.cycles() {
+        println!("{:?}", c);
+    }
+    println!("");
+
+    println!("## Z2Pair");
+    for (pers, _chain) in Pair::new(&reduce, reduce.cycles()) {
+        let index = pers.0;
+        let dim = pairs[index].0.len()-1;
+        match pers {
+            Persistence(b, Some(d)) => {
+                println!("{} {} {} {:.4} {:.4}", dim, b, d, pairs[b].1, pairs[d].1);
+            },
+            Persistence(b, None) => {
+                println!("{} {} N {:.4} inf", dim, b, pairs[b].1);
+            },
+        }
     }
 }
