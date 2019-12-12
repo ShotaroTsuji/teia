@@ -2,6 +2,7 @@ use std::fmt::Write;
 use std::io;
 use std::io::BufWriter;
 use std::fs::File;
+use std::path::{Path, PathBuf};
 use teia::Persistence;
 use teia::vietoris_rips::{DistanceMatrix, enumerate_simplices};
 use teia::simplex::Simplex;
@@ -11,6 +12,7 @@ use teia::z2vector::{Z2Chain, Z2VectorVec};
 use teia::z2reduce::Z2ColumnReduce;
 use teia::pair::Pair;
 use nalgebra::DVector;
+use structopt::StructOpt;
 
 #[derive(Debug, Clone)]
 struct FillStyle {
@@ -160,8 +162,25 @@ fn generate_circle(n: usize) -> Vec<DVector<f64>> {
     points
 }
 
+#[derive(Debug,Clone,StructOpt)]
+struct Opt {
+    #[structopt(short,long)]
+    number: usize,
+    #[structopt(long,parse(from_os_str))]
+    directory: PathBuf,
+}
+
 fn main() {
-    let circle = generate_circle(12);
+    let opt = Opt::from_args();
+    let directory = opt.directory.clone();
+    let dir_str = directory.to_str().unwrap();
+
+    if directory.exists() {
+        std::fs::remove_dir_all(directory.clone()).unwrap();
+    }
+    std::fs::create_dir_all(directory.clone()).unwrap();
+
+    let circle = generate_circle(opt.number);
 
     let dist = DistanceMatrix::from_fn(circle.len(), |i, j| {
         let a = circle[i].clone() - &circle[j];
@@ -191,12 +210,12 @@ fn main() {
     eprintln!("## {} simplices", pairs.len());
 
     for index in 0..pairs.len() {
-        let name = format!("vr2/vr-comp-{}-{:.3}.svg", index, pairs[index].1);
+        let name = format!("{}/vr-comp-{}-{:.3}.svg", dir_str, index, pairs[index].1);
         let f = File::create(name).unwrap();
         let mut w = BufWriter::new(f);
         emit_vr_svg(&mut w, &circle, &pairs, index+1).unwrap();
 
-        let name = format!("vr2/vr-ball-{}-{:.3}.svg", index, pairs[index].1);
+        let name = format!("{}/vr-ball-{}-{:.3}.svg", dir_str, index, pairs[index].1);
         let f = File::create(name).unwrap();
         let mut w = BufWriter::new(f);
         emit_balls_svg(&mut w, &circle, &pairs, index).unwrap();
