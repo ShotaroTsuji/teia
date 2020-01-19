@@ -100,7 +100,7 @@ fn emit_vr_svg<W: io::Write>(w: &mut W, points: &[DVector<f64>], pairs: &[(Vec<u
     let mut edges: Vec<&[usize]> = Vec::new();
     let mut triangles: Vec<&[usize]> = Vec::new();
 
-    for index in 0..max_index {
+    for index in 0..max_index+1 {
         if pairs[index].0.len() == 1 {
             vertices.push(&pairs[index].0[..]);
         } else if pairs[index].0.len() == 2 {
@@ -210,12 +210,12 @@ fn main() {
     eprintln!("## {} simplices", pairs.len());
 
     for index in 0..pairs.len() {
-        let name = format!("{}/vr-comp-{}-{:.3}.svg", dir_str, index, pairs[index].1);
+        let name = format!("{}/vr-comp-{:03}-{:.3}.svg", dir_str, index, pairs[index].1);
         let f = File::create(name).unwrap();
         let mut w = BufWriter::new(f);
-        emit_vr_svg(&mut w, &circle, &pairs, index+1).unwrap();
+        emit_vr_svg(&mut w, &circle, &pairs, index).unwrap();
 
-        let name = format!("{}/vr-ball-{}-{:.3}.svg", dir_str, index, pairs[index].1);
+        let name = format!("{}/vr-ball-{:03}-{:.3}.svg", dir_str, index, pairs[index].1);
         let f = File::create(name).unwrap();
         let mut w = BufWriter::new(f);
         emit_balls_svg(&mut w, &circle, &pairs, index).unwrap();
