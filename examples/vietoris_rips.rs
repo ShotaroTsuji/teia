@@ -13,6 +13,7 @@ use teia::z2reduce::Z2ColumnReduce;
 use teia::pair::Pair;
 use nalgebra::DVector;
 use structopt::StructOpt;
+use rand_distr::{Normal, Distribution};
 
 #[derive(Debug, Clone)]
 struct FillStyle {
@@ -162,12 +163,26 @@ fn generate_circle(n: usize) -> Vec<DVector<f64>> {
     points
 }
 
+fn add_noise(points: &[DVector<f64>], std_dev: f64) -> Vec<DVector<f64>> {
+    let normal = Normal::new(0.0, std_dev).unwrap();
+    points.iter()
+        .map(|pt| {
+            let normal = normal.clone();
+            let len = pt.len();
+            let n = DVector::from_iterator(len, normal.sample_iter(&mut rand::thread_rng()).take(len));
+            pt + n
+        })
+    .collect()
+}
+
 #[derive(Debug,Clone,StructOpt)]
 struct Opt {
     #[structopt(short,long)]
     number: usize,
     #[structopt(long,parse(from_os_str))]
     directory: PathBuf,
+    #[structopt(long)]
+    noise: Option<f64>,
 }
 
 fn main() {
@@ -181,6 +196,11 @@ fn main() {
     std::fs::create_dir_all(directory.clone()).unwrap();
 
     let circle = generate_circle(opt.number);
+
+    let circle = match opt.noise.clone() {
+        Some(std_dev) => add_noise(&circle, std_dev),
+        None => circle,
+    };
 
     let dist = DistanceMatrix::from_fn(circle.len(), |i, j| {
         let a = circle[i].clone() - &circle[j];

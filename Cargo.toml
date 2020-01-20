@@ -18,3 +18,5 @@ itertools = "0.8.1"
 
 [dev-dependencies]
 nalgebra = "0.18"
+rand = "0.7.3"
+rand_distr = "0.2.2"
