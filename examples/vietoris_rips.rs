@@ -1,4 +1,3 @@
-use std::fmt::Write;
 use std::io;
 use std::io::BufWriter;
 use std::fs::File;
@@ -44,6 +43,7 @@ impl DrawSpec {
 }
 
 fn emit_svg_points(points: &[DVector<f64>], indices: &[&[usize]], ps: f64, style: FillStyle, spec: DrawSpec) -> String {
+    use std::fmt::Write;
     let mut buf = String::new();
 
     writeln!(&mut buf, r#"<g fill="{}" fill-opacity="{}">"#, style.color, style.opacity).unwrap();
@@ -61,6 +61,7 @@ fn emit_svg_points(points: &[DVector<f64>], indices: &[&[usize]], ps: f64, style
 }
 
 fn emit_svg_edges(points: &[DVector<f64>], edges: &[&[usize]], style: StrokeStyle, spec: DrawSpec) -> String {
+    use std::fmt::Write;
     let mut buf = String::new();
 
     writeln!(&mut buf, r#"<g stroke="{}" stroke-width="{:.4}">"#, style.color, spec.map_scale(style.width)).unwrap();
@@ -78,6 +79,7 @@ fn emit_svg_edges(points: &[DVector<f64>], edges: &[&[usize]], style: StrokeStyl
 }
 
 fn emit_svg_triangles(points: &[DVector<f64>], triangles: &[&[usize]], style: FillStyle, spec: DrawSpec) -> String {
+    use std::fmt::Write;
     let mut buf = String::new();
 
     writeln!(&mut buf, r#"<g fill="{}" fill-opacity="{}">"#, style.color, style.opacity).unwrap();
@@ -97,6 +99,7 @@ fn emit_svg_triangles(points: &[DVector<f64>], triangles: &[&[usize]], style: Fi
 }
 
 fn emit_vr_svg<W: io::Write>(w: &mut W, points: &[DVector<f64>], pairs: &[(Vec<usize>, f64)], max_index: usize) -> io::Result<()> {
+    use std::fmt::Write;
     let mut vertices: Vec<&[usize]> = Vec::new();
     let mut edges: Vec<&[usize]> = Vec::new();
     let mut triangles: Vec<&[usize]> = Vec::new();
@@ -128,6 +131,7 @@ fn emit_vr_svg<W: io::Write>(w: &mut W, points: &[DVector<f64>], pairs: &[(Vec<u
 }
 
 fn emit_balls_svg<W: io::Write>(w: &mut W, points: &[DVector<f64>], pairs: &[(Vec<usize>, f64)], max_index: usize) -> io::Result<()> {
+    use std::fmt::Write;
     let mut vertices: Vec<&[usize]> = Vec::new();
 
     for index in 0..max_index {
@@ -263,16 +267,27 @@ fn main() {
     println!("");
 
     println!("## Z2Pair");
-    for (pers, _chain) in Pair::new(&reduce, reduce.cycles()) {
-        let index = pers.0;
-        let dim = pairs[index].0.len()-1;
-        match pers {
-            Persistence(b, Some(d)) => {
-                println!("{} {} {} {:.4} {:.4}", dim, b, d, pairs[b].1, pairs[d].1);
-            },
-            Persistence(b, None) => {
-                println!("{} {} N {:.4} inf", dim, b, pairs[b].1);
-            },
+    {
+        use std::io::Write;
+        let name = format!("{}/vr-comp-phom.txt", dir_str);
+        let f = File::create(name).unwrap();
+        let mut w = BufWriter::new(f);
+        let o = std::io::stdout();
+        let mut o = BufWriter::new(o.lock());
+
+        for (pers, _chain) in Pair::new(&reduce, reduce.cycles()) {
+            let index = pers.0;
+            let dim = pairs[index].0.len()-1;
+            let s = match pers {
+                Persistence(b, Some(d)) => {
+                    format!("{} {} {} {:.4} {:.4}\n", dim, b, d, pairs[b].1, pairs[d].1)
+                },
+                Persistence(b, None) => {
+                    format!("{} {} N {:.4} inf\n", dim, b, pairs[b].1)
+                },
+            };
+            w.write(s.as_bytes()).unwrap();
+            o.write(s.as_bytes()).unwrap();
         }
     }
 }
